@@ -35,20 +35,38 @@ class GameBoard
 
     board
   end
+
+  def display_board
+    @game_board.each_with_index do |rank, idx|
+      output = "#{@game_board.length - idx}|"
+
+      rank.each do |board_square|
+        output += board_square.is_occupied ? "#{board_square.occupying_piece}|" : ' |'
+      end
+
+      puts output
+    end
+
+    puts "  #{@files.join(' ')}"
+  end
 end
 
 g = GameBoard.new(('A'..'H'), (1..8))
+g.display_board
 
-g.game_board.each_with_index do |rank, idx|
-  num = g.game_board.length - idx
-  output = "#{num}|"
-  rank.each do |board_square|
-    output += if !board_square.is_occupied
-                ' |'
-              else
-                "#{board_square.occupying_piece}|"
-              end
-  end
+# g.game_board[0][0].occupying_piece = "\u265A"
+# g.game_board[0][0].is_occupied = true
 
-  puts output
-end
+# g.game_board.each_with_index do |rank, idx|
+#   num = g.game_board.length - idx
+#   output = "#{num}|"
+#   rank.each do |board_square|
+#     output += if !board_square.is_occupied
+#                 ' |'
+#               else
+#                 "#{board_square.occupying_piece}|"
+#               end
+#   end
+
+#   puts output
+# end
