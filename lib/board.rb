@@ -51,5 +51,5 @@ class GameBoard
   end
 end
 
-g = GameBoard.new(('A'..'H'), (1..8))
-g.display_board
+# g = GameBoard.new(('A'..'H'), (1..8))
+# g.display_board
