@@ -16,11 +16,39 @@ require_relative 'board_square'
 # puts '  A B C D E F G H'
 
 class GameBoard
+  attr_accessor :game_board
+
   def initialize(files, ranks)
     @files = files.to_a
     @ranks = ranks.to_a.reverse
     @game_board = create_board(@files, @ranks)
   end
 
-  def create_board(files, ranks); end
+  def create_board(files, ranks)
+    board = []
+
+    ranks.each do |rank|
+      row = []
+      files.each { |file| row.push(BoardSquare.new(file, rank)) }
+      board.push(row)
+    end
+
+    board
+  end
+end
+
+g = GameBoard.new(('A'..'H'), (1..8))
+
+g.game_board.each_with_index do |rank, idx|
+  num = g.game_board.length - idx
+  output = "#{num}|"
+  rank.each do |board_square|
+    output += if !board_square.is_occupied
+                ' |'
+              else
+                "#{board_square.occupying_piece}|"
+              end
+  end
+
+  puts output
 end
