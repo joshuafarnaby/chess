@@ -18,55 +18,38 @@ require_relative 'board_square'
 class GameBoard
   attr_accessor :game_board
 
-  def initialize(files, ranks)
-    @files = files.to_a
-    @ranks = ranks.to_a.reverse
-    @game_board = create_board(@files, @ranks)
+  def initialize(columns, rows)
+    @columns = columns.to_a
+    @rows = rows.to_a.reverse
+    @game_board = create_board(@columns, @rows)
   end
 
-  def create_board(files, ranks)
+  def create_board(columns, rows)
     board = []
 
-    ranks.each do |rank|
-      row = []
-      files.each { |file| row.push(BoardSquare.new(file, rank)) }
-      board.push(row)
+    rows.each do |row|
+      new_row = []
+      columns.each { |column| new_row.push(BoardSquare.new(column, row)) }
+      board.push(new_row)
     end
 
     board
   end
 
   def display_board
-    @game_board.each_with_index do |rank, idx|
+    @game_board.each_with_index do |row, idx|
       output = "#{@game_board.length - idx}|"
 
-      rank.each do |board_square|
+      row.each do |board_square|
         output += board_square.is_occupied ? "#{board_square.occupying_piece}|" : ' |'
       end
 
       puts output
     end
 
-    puts "  #{@files.join(' ')}"
+    puts "  #{@columns.join(' ')}"
   end
 end
 
 g = GameBoard.new(('A'..'H'), (1..8))
 g.display_board
-
-# g.game_board[0][0].occupying_piece = "\u265A"
-# g.game_board[0][0].is_occupied = true
-
-# g.game_board.each_with_index do |rank, idx|
-#   num = g.game_board.length - idx
-#   output = "#{num}|"
-#   rank.each do |board_square|
-#     output += if !board_square.is_occupied
-#                 ' |'
-#               else
-#                 "#{board_square.occupying_piece}|"
-#               end
-#   end
-
-#   puts output
-# end
