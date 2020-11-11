@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require_relative 'board'
-require_relative 'king'
-require_relative 'queen'
-require_relative 'rook'
-require_relative 'knight'
-require_relative 'bishop'
-require_relative 'pawn'
+require_relative './chess_pieces/king'
+require_relative './chess_pieces/queen'
+require_relative './chess_pieces/rook'
+require_relative './chess_pieces/knight'
+require_relative './chess_pieces/bishop'
+require_relative './chess_pieces/pawn'
 
 class Chess
   # attr_accessor :chess_board
