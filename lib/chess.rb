@@ -9,7 +9,7 @@ require_relative './chess_pieces/bishop'
 require_relative './chess_pieces/pawn'
 
 class Chess
-  # attr_accessor :chess_board
+  attr_accessor :chess_board
 
   def initialize
     @chess_board = initialize_chess_board(GameBoard.new(('A'..'H'), (1..8)))
@@ -55,12 +55,4 @@ class Chess
       end
     end
   end
-
-  def display_chess_board
-    @chess_board.display_board
-  end
 end
-
-c = Chess.new
-
-c.display_chess_board
