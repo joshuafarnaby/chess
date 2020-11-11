@@ -12,10 +12,10 @@ class Chess
   # attr_accessor :chess_board
 
   def initialize
-    @chess_board = populate_board_start(GameBoard.new(('A'..'H'), (1..8)))
+    @chess_board = initialize_chess_board(GameBoard.new(('A'..'H'), (1..8)))
   end
 
-  def populate_board_start(game_board)
+  def initialize_chess_board(game_board)
     add_back_row(game_board.game_board[7], 'white')
     add_pawns(game_board.game_board[6], 'white')
 
