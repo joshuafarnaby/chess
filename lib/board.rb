@@ -41,7 +41,7 @@ class GameBoard
       output = "#{@game_board.length - idx}|"
 
       row.each do |board_square|
-        output += board_square.is_occupied ? "#{board_square.occupying_piece}|" : ' |'
+        output += board_square.is_occupied ? "#{board_square.occupying_piece.symbol}|" : ' |'
       end
 
       puts output
