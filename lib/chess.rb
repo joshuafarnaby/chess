@@ -15,6 +15,8 @@ class Chess
     @chess_board = initialize_chess_board(GameBoard.new(('A'..'H'), (1..8)))
   end
 
+  private
+
   def initialize_chess_board(game_board)
     add_back_row(game_board.game_board[7], 'white')
     add_pawns(game_board.game_board[6], 'white')
@@ -33,26 +35,63 @@ class Chess
   end
 
   def add_back_row(rank, color)
-    rank.each_with_index do |square, idx|
-      if idx == 0 || idx == 7
-        square.occupying_piece = Rook.new(color)
-        square.is_occupied = true
-        next
-      elsif idx == 1 || idx == 6
-        square.occupying_piece = Knight.new(color)
-        square.is_occupied = true
-        next
-      elsif idx == 2 || idx == 5
-        square.occupying_piece = Bishop.new(color)
-        square.is_occupied = true
-        next
-      elsif idx == 3
-        square.occupying_piece = Queen.new(color)
-        square.is_occupied = true
-      elsif idx == 4
-        square.occupying_piece = King.new(color)
-        square.is_occupied = true
-      end
-    end
+    add_rooks(rank, color)
+    add_knights(rank, color)
+    add_bishops(rank, color)
+    add_queen_and_king(rank, color)
+
+    # rank.each_with_index do |square, idx|
+    #   if idx == 0 || idx == 7
+    #     square.occupying_piece = Rook.new(color)
+    #     square.is_occupied = true
+    #     next
+    #   elsif idx == 1 || idx == 6
+    #     square.occupying_piece = Knight.new(color)
+    #     square.is_occupied = true
+    #     next
+    #   elsif idx == 2 || idx == 5
+    #     square.occupying_piece = Bishop.new(color)
+    #     square.is_occupied = true
+    #     next
+    #   elsif idx == 3
+    #     square.occupying_piece = Queen.new(color)
+    #     square.is_occupied = true
+    #   elsif idx == 4
+    #     square.occupying_piece = King.new(color)
+    #     square.is_occupied = true
+    #   end
+    # end
+  end
+
+  def add_rooks(rank, color)
+    rank[0].occupying_piece = Rook.new(color)
+    rank[0].is_occupied = true
+
+    rank[7].occupying_piece = Rook.new(color)
+    rank[7].is_occupied = true
+  end
+
+  def add_knights(rank, color)
+    rank[1].occupying_piece = Knight.new(color)
+    rank[1].is_occupied = true
+
+    rank[6].occupying_piece = Knight.new(color)
+    rank[6].is_occupied = true
+  end
+
+  def add_bishops(rank, color)
+    rank[2].occupying_piece = Bishop.new(color)
+    rank[2].is_occupied = true
+
+    rank[5].occupying_piece = Bishop.new(color)
+    rank[5].is_occupied = true
+  end
+
+  def add_queen_and_king(rank, color)
+    rank[3].occupying_piece = Queen.new(color)
+    rank[3].is_occupied = true
+
+    rank[4].occupying_piece = King.new(color)
+    rank[4].is_occupied = true
   end
 end

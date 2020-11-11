@@ -8,7 +8,7 @@ class BoardSquare
     @rank = rank
     @position = [@file, @rank]
     # @index = [@file - 1, @rank - 1]
-    @is_occupied = false
     @occupying_piece = nil
+    @is_occupied = false
   end
 end
