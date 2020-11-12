@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Pawn
-  attr_reader :symbol
+  attr_reader :symbol, :team
 
   def initialize(team)
     @team = team
