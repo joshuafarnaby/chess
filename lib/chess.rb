@@ -23,9 +23,19 @@ class Chess < GameBoard
   attr_accessor :chess_board
 
   def initialize
+    @white_pieces = [
+      [Rook.new('white'), Knight.new('white'), Bishop.new('white'), Queen.new('white'), King.new('white'), Bishop.new('white'), Knight.new('white'), Rook.new('white')],
+      [Pawn.new('white'), Pawn.new('white'), Pawn.new('white'), Pawn.new('white'), Pawn.new('white'), Pawn.new('white'), Pawn.new('white'), Pawn.new('white')]
+    ]
+
+    @black_pieces = [
+      [Rook.new('black'), Knight.new('black'), Bishop.new('black'), Queen.new('black'), King.new('black'), Bishop.new('black'), Knight.new('black'), Rook.new('black')],
+      [Pawn.new('black'), Pawn.new('black'), Pawn.new('black'), Pawn.new('black'), Pawn.new('black'), Pawn.new('black'), Pawn.new('black'), Pawn.new('black')]
+    ]
+
     @files = %w[A B C D E F G H]
-    @ranks = [1, 2, 3, 4, 5, 6, 7, 8].reverse
-    @chess_board = initialize_chess_board(create_board(@files, @ranks))
+    @ranks = [8, 7, 6, 5, 4, 3, 2, 1]
+    @chess_board = initialize_chess_board
   end
 
   def display_in_terminal
@@ -44,59 +54,36 @@ class Chess < GameBoard
 
   private
 
-  def initialize_chess_board(game_board)
-    add_back_row(game_board[7], 'white')
-    add_pawns(game_board[6], 'white')
+  def initialize_chess_board
+    chess_board = create_board(@files, @ranks)
 
-    add_back_row(game_board[0], 'black')
-    add_pawns(game_board[1], 'black')
+    add_white_pieces_to_board(chess_board)
+    add_black_pieces_to_board(chess_board)
 
-    game_board
+    chess_board
   end
 
-  def add_pawns(rank, color)
-    rank.each do |square|
-      square.occupying_piece = Pawn.new(color)
+  def add_white_pieces_to_board(chess_board)
+    chess_board[7].each_with_index do |square, idx|
+      square.occupying_piece = @white_pieces[0][idx]
+      square.is_occupied = true
+    end
+
+    chess_board[6].each_with_index do |square, idx|
+      square.occupying_piece = @white_pieces[1][idx]
       square.is_occupied = true
     end
   end
 
-  def add_back_row(rank, color)
-    add_rooks(rank, color)
-    add_knights(rank, color)
-    add_bishops(rank, color)
-    add_queen_and_king(rank, color)
-  end
+  def add_black_pieces_to_board(chess_board)
+    chess_board[0].each_with_index do |square, idx|
+      square.occupying_piece = @black_pieces[0][idx]
+      square.is_occupied = true
+    end
 
-  def add_rooks(rank, color)
-    rank[0].occupying_piece = Rook.new(color)
-    rank[0].is_occupied = true
-
-    rank[7].occupying_piece = Rook.new(color)
-    rank[7].is_occupied = true
-  end
-
-  def add_knights(rank, color)
-    rank[1].occupying_piece = Knight.new(color)
-    rank[1].is_occupied = true
-
-    rank[6].occupying_piece = Knight.new(color)
-    rank[6].is_occupied = true
-  end
-
-  def add_bishops(rank, color)
-    rank[2].occupying_piece = Bishop.new(color)
-    rank[2].is_occupied = true
-
-    rank[5].occupying_piece = Bishop.new(color)
-    rank[5].is_occupied = true
-  end
-
-  def add_queen_and_king(rank, color)
-    rank[3].occupying_piece = Queen.new(color)
-    rank[3].is_occupied = true
-
-    rank[4].occupying_piece = King.new(color)
-    rank[4].is_occupied = true
+    chess_board[1].each_with_index do |square, idx|
+      square.occupying_piece = @black_pieces[1][idx]
+      square.is_occupied = true
+    end
   end
 end
