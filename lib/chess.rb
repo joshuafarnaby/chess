@@ -24,7 +24,7 @@ class Chess < GameBoard
 
   def initialize
     @files = %w[A B C D E F G H]
-    @ranks = [1, 2, 3, 4, 5, 6, 7, 8]
+    @ranks = [1, 2, 3, 4, 5, 6, 7, 8].reverse
     @chess_board = initialize_chess_board(create_board(@files, @ranks))
   end
 
