@@ -9,6 +9,17 @@ require_relative './chess_pieces/bishop'
 require_relative './chess_pieces/pawn'
 
 class Chess
+  FILE_INDEX_CONVERTER = {
+    'A' => 0,
+    'B' => 1,
+    'C' => 2,
+    'D' => 3,
+    'E' => 4,
+    'F' => 5,
+    'G' => 6,
+    'H' => 7
+  }.freeze
+
   attr_accessor :chess_board
 
   def initialize
@@ -39,28 +50,6 @@ class Chess
     add_knights(rank, color)
     add_bishops(rank, color)
     add_queen_and_king(rank, color)
-
-    # rank.each_with_index do |square, idx|
-    #   if idx == 0 || idx == 7
-    #     square.occupying_piece = Rook.new(color)
-    #     square.is_occupied = true
-    #     next
-    #   elsif idx == 1 || idx == 6
-    #     square.occupying_piece = Knight.new(color)
-    #     square.is_occupied = true
-    #     next
-    #   elsif idx == 2 || idx == 5
-    #     square.occupying_piece = Bishop.new(color)
-    #     square.is_occupied = true
-    #     next
-    #   elsif idx == 3
-    #     square.occupying_piece = Queen.new(color)
-    #     square.is_occupied = true
-    #   elsif idx == 4
-    #     square.occupying_piece = King.new(color)
-    #     square.is_occupied = true
-    #   end
-    # end
   end
 
   def add_rooks(rank, color)
