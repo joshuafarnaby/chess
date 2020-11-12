@@ -23,18 +23,4 @@ class GameBoard
 
     board
   end
-
-  def display_in_terminal
-    @game_board.each_with_index do |row, idx|
-      output = "#{@game_board.length - idx}|"
-
-      row.each do |board_square|
-        output += board_square.is_occupied ? "#{board_square.occupying_piece.symbol}|" : ' |'
-      end
-
-      puts output
-    end
-
-    puts "  #{@columns.join(' ')}"
-  end
 end

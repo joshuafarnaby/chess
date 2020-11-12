@@ -8,7 +8,7 @@ require_relative './chess_pieces/knight'
 require_relative './chess_pieces/bishop'
 require_relative './chess_pieces/pawn'
 
-class Chess
+class Chess < GameBoard
   FILE_INDEX_CONVERTER = {
     'A' => 0,
     'B' => 1,
@@ -23,17 +23,33 @@ class Chess
   attr_accessor :chess_board
 
   def initialize
-    @chess_board = initialize_chess_board(GameBoard.new(('A'..'H'), (1..8)))
+    @files = %w[A B C D E F G H]
+    @ranks = [1, 2, 3, 4, 5, 6, 7, 8]
+    @chess_board = initialize_chess_board(create_board(@files, @ranks))
+  end
+
+  def display_in_terminal
+    @chess_board.each_with_index do |row, idx|
+      output = "#{@chess_board.length - idx}|"
+
+      row.each do |board_square|
+        output += board_square.is_occupied ? "#{board_square.occupying_piece.symbol}|" : ' |'
+      end
+
+      puts output
+    end
+
+    puts "  #{@files.join(' ')}"
   end
 
   private
 
   def initialize_chess_board(game_board)
-    add_back_row(game_board.game_board[7], 'white')
-    add_pawns(game_board.game_board[6], 'white')
+    add_back_row(game_board[7], 'white')
+    add_pawns(game_board[6], 'white')
 
-    add_back_row(game_board.game_board[0], 'black')
-    add_pawns(game_board.game_board[1], 'black')
+    add_back_row(game_board[0], 'black')
+    add_pawns(game_board[1], 'black')
 
     game_board
   end
