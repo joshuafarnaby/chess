@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class BoardSquare
-  attr_accessor :is_occupied, :occupying_piece
+  attr_accessor :is_occupied, :occupying_piece, :position
 
   def initialize(file, rank)
     @position = "#{file}#{rank}"

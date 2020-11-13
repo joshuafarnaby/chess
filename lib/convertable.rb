@@ -14,7 +14,6 @@ module Convertable
 
   def convert_filerank_to_index(filerank)
     temp = filerank.split('')
-    p temp
     [7 - (temp[1].to_i - 1), FILE_INDEX_CONVERTER[temp[0]]]
   end
 end

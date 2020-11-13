@@ -10,17 +10,6 @@ require_relative './chess_pieces/bishop'
 require_relative './chess_pieces/pawn'
 
 class Chess < GameBoard
-  # FILE_INDEX_CONVERTER = {
-  #   'A' => 0,
-  #   'B' => 1,
-  #   'C' => 2,
-  #   'D' => 3,
-  #   'E' => 4,
-  #   'F' => 5,
-  #   'G' => 6,
-  #   'H' => 7
-  # }.freeze
-
   include Convertable
 
   attr_accessor :chess_board, :rounds_played
@@ -41,6 +30,7 @@ class Chess < GameBoard
     @chess_board = initialize_chess_board
 
     @rounds_played = 0
+    @graveyard = []
   end
 
   def display_in_terminal
@@ -61,8 +51,6 @@ class Chess < GameBoard
     square_with_piece_to_move = get_square_with_piece_to_move(current_player)
 
     target_square = get_target_square(square_with_piece_to_move, current_player)
-
-    puts square_with_piece_to_move
   end
 
   def get_square_with_piece_to_move(current_player)
@@ -96,7 +84,6 @@ class Chess < GameBoard
       input = gets.chomp.upcase
       if !input.match(/[a-hA-H]{1}[1-8]{1}/).nil?
         pos_index = convert_filerank_to_index(input)
-        p pos_index
         target_square = @chess_board[pos_index[0]][pos_index[1]]
         if move_is_legal?(starting_square, target_square, current_player) && path_is_clear?(starting_square, target_square)
           return target_square
@@ -113,20 +100,29 @@ class Chess < GameBoard
   def move_is_legal?(starting_square, target_square, current_player)
     moving_piece = starting_square.occupying_piece
 
-    moving_piece.can_make_move?(starting_square, target_square, current_player)
+    execute_move(starting_square, target_square) if moving_piece.can_make_move?(starting_square, target_square, current_player)
   end
 
   def path_is_clear?(_start_pos, _end_pos)
     true
   end
 
-  private
+  def execute_move(starting_square, target_square)
+    moving_piece = starting_square.occupying_piece
 
-  # def convert_filerank_to_index(filerank)
-  #   temp = filerank.split('')
-  #   p temp
-  #   [7 - (temp[1].to_i - 1), FILE_INDEX_CONVERTER[temp[0]]]
-  # end
+    starting_square.occupying_piece = nil
+    starting_square.is_occupied = false
+
+    if target_square.is_occupied
+      @graveyard.push(target_square.occupying_piece)
+      target_square.occupying_piece = moving_piece
+    else
+      target_square.occupying_piece = moving_piece
+      target_square.is_occupied = true
+    end
+  end
+
+  private
 
   def initialize_chess_board
     chess_board = create_board(@files, @ranks)
