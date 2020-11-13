@@ -9,5 +9,4 @@ white_turn = true
 
 current_player = white_turn ? 'white' : 'black'
 
-pos = chess_game.get_square_with_piece_to_move(current_player)
-p pos
+chess_game.take_turn(current_player)

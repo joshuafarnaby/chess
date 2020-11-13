@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'board'
+require_relative 'convertable'
 require_relative './chess_pieces/king'
 require_relative './chess_pieces/queen'
 require_relative './chess_pieces/rook'
@@ -9,16 +10,18 @@ require_relative './chess_pieces/bishop'
 require_relative './chess_pieces/pawn'
 
 class Chess < GameBoard
-  FILE_INDEX_CONVERTER = {
-    'A' => 0,
-    'B' => 1,
-    'C' => 2,
-    'D' => 3,
-    'E' => 4,
-    'F' => 5,
-    'G' => 6,
-    'H' => 7
-  }.freeze
+  # FILE_INDEX_CONVERTER = {
+  #   'A' => 0,
+  #   'B' => 1,
+  #   'C' => 2,
+  #   'D' => 3,
+  #   'E' => 4,
+  #   'F' => 5,
+  #   'G' => 6,
+  #   'H' => 7
+  # }.freeze
+
+  include Convertable
 
   attr_accessor :chess_board, :rounds_played
 
@@ -54,8 +57,16 @@ class Chess < GameBoard
     puts "  #{@files.join(' ')}"
   end
 
+  def take_turn(current_player)
+    square_with_piece_to_move = get_square_with_piece_to_move(current_player)
+
+    target_square = get_target_square(square_with_piece_to_move, current_player)
+
+    puts square_with_piece_to_move
+  end
+
   def get_square_with_piece_to_move(current_player)
-    puts 'Please enter the position of the piece you want to move (e.g. A5):'
+    puts 'Enter the position of the piece you want to move (e.g. A5):'
     loop do
       input = gets.chomp.upcase
       if !input.match(/[a-hA-H]{1}[1-8]{1}/).nil?
@@ -67,6 +78,8 @@ class Chess < GameBoard
         elsif board_square.occupying_piece.team != current_player
           puts 'The piece on that square belongs to the opposition, please choose another:'
           next
+        elsif @rounds_played < 2 && board_square.occupying_piece.name != 'pawn'
+          puts 'You must move a pawn for your first go'
         else
           return board_square
         end
@@ -77,12 +90,43 @@ class Chess < GameBoard
     end
   end
 
+  def get_target_square(starting_square, current_player)
+    puts 'Now enter the position you want to move to:'
+    loop do
+      input = gets.chomp.upcase
+      if !input.match(/[a-hA-H]{1}[1-8]{1}/).nil?
+        pos_index = convert_filerank_to_index(input)
+        p pos_index
+        target_square = @chess_board[pos_index[0]][pos_index[1]]
+        if move_is_legal?(starting_square, target_square, current_player) && path_is_clear?(starting_square, target_square)
+          return target_square
+        else
+          puts 'That move cannot be made, please choose another position:'
+        end
+      else
+        puts 'That position is invalid, please choose another:'
+        next
+      end
+    end
+  end
+
+  def move_is_legal?(starting_square, target_square, current_player)
+    moving_piece = starting_square.occupying_piece
+
+    moving_piece.can_make_move?(starting_square, target_square, current_player)
+  end
+
+  def path_is_clear?(_start_pos, _end_pos)
+    true
+  end
+
   private
 
-  def convert_filerank_to_index(filerank)
-    temp = filerank.split('')
-    [7 - (temp[1].to_i - 1), FILE_INDEX_CONVERTER[temp[0]]]
-  end
+  # def convert_filerank_to_index(filerank)
+  #   temp = filerank.split('')
+  #   p temp
+  #   [7 - (temp[1].to_i - 1), FILE_INDEX_CONVERTER[temp[0]]]
+  # end
 
   def initialize_chess_board
     chess_board = create_board(@files, @ranks)
