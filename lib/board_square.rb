@@ -9,4 +9,9 @@ class BoardSquare
     @occupying_piece = nil
     @is_occupied = false
   end
+
+  def reset
+    @occupying_piece = nil
+    @is_occupied = false
+  end
 end

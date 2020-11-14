@@ -30,7 +30,8 @@ class Chess < GameBoard
     @chess_board = initialize_chess_board
 
     @rounds_played = 0
-    @graveyard = []
+    @white_graveyard = []
+    @black_graveyard = []
   end
 
   def display_in_terminal
@@ -47,74 +48,47 @@ class Chess < GameBoard
     puts "  #{@files.join(' ')}"
   end
 
-  def take_turn(current_player)
-    square_with_piece_to_move = get_square_with_piece_to_move(current_player)
-
-    target_square = get_target_square(square_with_piece_to_move, current_player)
-  end
-
-  def get_square_with_piece_to_move(current_player)
+  def gets_starter_square(current_player)
     puts 'Enter the position of the piece you want to move (e.g. A5):'
+
     loop do
-      input = gets.chomp.upcase
-      if !input.match(/[a-hA-H]{1}[1-8]{1}/).nil?
-        pos_index = convert_filerank_to_index(input)
-        board_square = @chess_board[pos_index[0]][pos_index[1]]
-        if board_square.occupying_piece.nil?
-          puts 'That position is empty, please choose another:'
-          next
-        elsif board_square.occupying_piece.team != current_player
-          puts 'The piece on that square belongs to the opposition, please choose another:'
-          next
-        elsif @rounds_played < 2 && board_square.occupying_piece.name != 'pawn'
-          puts 'You must move a pawn for your first go'
-        else
-          return board_square
-        end
-      else
-        puts 'That position is invalid, please choose another:'
-        next
-      end
+      start_file_rank = gets_file_rank
+
+      board_indicies = convert_filerank_to_index(start_file_rank)
+      starter_square = @chess_board[board_indicies[0]][board_indicies[1]]
+
+      return starter_square if valid_starter_square?(starter_square, current_player)
+
+      puts 'That postion is invalid, choose another:'
     end
   end
 
-  def get_target_square(starting_square, current_player)
-    puts 'Now enter the position you want to move to:'
-    loop do
-      input = gets.chomp.upcase
-      if !input.match(/[a-hA-H]{1}[1-8]{1}/).nil?
-        pos_index = convert_filerank_to_index(input)
-        target_square = @chess_board[pos_index[0]][pos_index[1]]
-        if move_is_legal?(starting_square, target_square, current_player) && path_is_clear?(starting_square, target_square)
-          return target_square
-        else
-          puts 'That move cannot be made, please choose another position:'
-        end
-      else
-        puts 'That position is invalid, please choose another:'
-        next
-      end
-    end
-  end
+  def valid_starter_square?(board_square, current_player)
+    return false if board_square.occupying_piece.nil?
+    return false if board_square.occupying_piece.team != current_player
+    return false if board_square.occupying_piece.blocked?(board_square, @chess_board)
 
-  def move_is_legal?(starting_square, target_square, current_player)
-    moving_piece = starting_square.occupying_piece
-
-    execute_move(starting_square, target_square) if moving_piece.can_make_move?(starting_square, target_square, current_player)
-  end
-
-  def path_is_clear?(_start_pos, _end_pos)
     true
+  end
+
+  def gets_file_rank
+    loop do
+      input = gets.chomp.upcase
+
+      return input unless input.match(/[a-hA-H]{1}[1-8]{1}/).nil?
+
+      puts 'That position is invalid, enter another:'
+    end
   end
 
   def execute_move(starting_square, target_square)
     moving_piece = starting_square.occupying_piece
 
-    starting_square.occupying_piece = nil
-    starting_square.is_occupied = false
+    starting_square.reset
 
     if target_square.is_occupied
-      @graveyard.push(target_square.occupying_piece)
+      moving_piece.team == 'white' ? black_graveyard.push(target_square.occupying_piece) : white_graveyard.push(target_square.occupying_piece)
+      # @graveyard.push(target_square.occupying_piece)
       target_square.occupying_piece = moving_piece
     else
       target_square.occupying_piece = moving_piece

@@ -19,10 +19,6 @@ class Pawn
     start_index = convert_filerank_to_index(start_pos.position)
     end_index = convert_filerank_to_index(end_pos.position)
 
-    p start_index
-    p end_index
-    p curr_player
-
     return false if start_index[1] != end_index[1]
 
     if @moves_made < 1
@@ -38,5 +34,17 @@ class Pawn
         end_index[0] - start_index[0] == 1
       end
     end
+  end
+
+  def blocked?(board_square, chess_board)
+    board_indicies = convert_filerank_to_index(board_square.position)
+
+    if @team == 'white'
+      return false if chess_board[board_indicies[0] - 1][board_indicies[1]].is_occupied == false
+    else
+      return false if chess_board[board_indicies[0] + 1][board_indicies[1]].is_occupied == false
+    end
+
+    true
   end
 end
