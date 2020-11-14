@@ -8,7 +8,7 @@ chess_game.display_in_terminal
 white_turn = true
 current_player = white_turn ? 'white' : 'black'
 
-5.times do
+3.times do
   current_player = white_turn ? 'white' : 'black'
 
   s = chess_game.gets_starter_square(current_player)

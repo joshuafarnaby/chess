@@ -5,13 +5,13 @@ require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/convertable.rb'
 class Pawn
   include Convertable
 
-  attr_reader :name, :team, :symbol
+  attr_reader :name, :color, :symbol
   attr_accessor :moves_made
 
-  def initialize(team)
+  def initialize(color)
     @name = 'pawn'
-    @team = team
-    @symbol = @team == 'white' ? "\u2659" : "\u265F"
+    @color = color
+    @symbol = @color == 'white' ? "\u2659" : "\u265F"
     @moves_made = 0
     @in_play = true
   end
@@ -46,10 +46,10 @@ class Pawn
     end
   end
 
-  def blocked_in?(board_square, chess_board)
+  def blocked_in?(board_square, chess_board, _curr_player)
     board_indicies = convert_filerank_to_index(board_square.position)
 
-    if @team == 'white'
+    if @color == 'white'
       return false if chess_board[board_indicies[0] - 1][board_indicies[1]].is_occupied == false
     else
       return false if chess_board[board_indicies[0] + 1][board_indicies[1]].is_occupied == false

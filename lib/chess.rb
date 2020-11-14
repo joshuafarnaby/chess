@@ -54,7 +54,9 @@ class Chess < GameBoard
     starting_square.reset
 
     if target_square.is_occupied
-      moving_piece.team == 'white' ? @black_graveyard.push(target_square.occupying_piece) : @white_graveyard.push(target_square.occupying_piece)
+      captured_piece = target_square.occupying_piece
+      captured_piece.in_play = false
+      moving_piece.team == 'white' ? @black_graveyard.push(captured_piece) : @white_graveyard.push(captured_piece)
       target_square.occupying_piece = moving_piece
     else
       target_square.occupying_piece = moving_piece
@@ -96,8 +98,8 @@ class Chess < GameBoard
 
   def valid_starter_square?(board_square, current_player)
     return false if board_square.occupying_piece.nil?
-    return false if board_square.occupying_piece.team != current_player
-    return false if board_square.occupying_piece.blocked_in?(board_square, @chess_board)
+    return false if board_square.occupying_piece.color != current_player
+    return false if board_square.occupying_piece.blocked_in?(board_square, @chess_board, current_player)
 
     true
   end
@@ -108,7 +110,7 @@ class Chess < GameBoard
     return false if target_square.is_occupied && target_square.occupying_piece.team == current_player
     return false unless moving_piece.move_is_legal?(starter_square, target_square, @chess_board, current_player)
 
-    # return false if piece_to_move.path_is_blocked?(starter_square, target_square, @chess_board)
+    # return false if moving_piece.path_is_blocked?(starter_square, target_square, @chess_board)
 
     true
   end

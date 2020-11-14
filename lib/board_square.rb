@@ -5,7 +5,6 @@ class BoardSquare
 
   def initialize(file, rank)
     @position = "#{file}#{rank}"
-    # @position = [@file, @rank]
     @occupying_piece = nil
     @is_occupied = false
   end
