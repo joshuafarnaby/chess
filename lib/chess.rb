@@ -48,6 +48,22 @@ class Chess < GameBoard
     puts "  #{@files.join(' ')}"
   end
 
+  def execute_move(starting_square, target_square)
+    moving_piece = starting_square.occupying_piece
+
+    starting_square.reset
+
+    if target_square.is_occupied
+      moving_piece.team == 'white' ? @black_graveyard.push(target_square.occupying_piece) : @white_graveyard.push(target_square.occupying_piece)
+      target_square.occupying_piece = moving_piece
+    else
+      target_square.occupying_piece = moving_piece
+      target_square.is_occupied = true
+    end
+
+    moving_piece.moves_made += 1
+  end
+
   def gets_starter_square(current_player)
     puts 'Enter the position of the piece you want to move (e.g. A5):'
 
@@ -63,37 +79,38 @@ class Chess < GameBoard
     end
   end
 
+  def gets_target_square(current_player, starter_square)
+    puts 'Enter the position of the square you want to move to:'
+
+    loop do
+      target_file_rank = gets_file_rank
+
+      board_indicies = convert_filerank_to_index(target_file_rank)
+      target_square = @chess_board[board_indicies[0]][board_indicies[1]]
+
+      return target_square if valid_target_square?(starter_square, target_square, current_player)
+
+      puts 'That move cannot be executed, choose another position:'
+    end
+  end
+
   def valid_starter_square?(board_square, current_player)
     return false if board_square.occupying_piece.nil?
     return false if board_square.occupying_piece.team != current_player
-    return false if board_square.occupying_piece.blocked?(board_square, @chess_board)
+    return false if board_square.occupying_piece.blocked_in?(board_square, @chess_board)
 
     true
   end
 
-  def gets_file_rank
-    loop do
-      input = gets.chomp.upcase
+  def valid_target_square?(starter_square, target_square, current_player)
+    moving_piece = starter_square.occupying_piece
 
-      return input unless input.match(/[a-hA-H]{1}[1-8]{1}/).nil?
+    return false if target_square.is_occupied && target_square.occupying_piece.team == current_player
+    return false unless moving_piece.move_is_legal?(starter_square, target_square, @chess_board, current_player)
 
-      puts 'That position is invalid, enter another:'
-    end
-  end
+    # return false if piece_to_move.path_is_blocked?(starter_square, target_square, @chess_board)
 
-  def execute_move(starting_square, target_square)
-    moving_piece = starting_square.occupying_piece
-
-    starting_square.reset
-
-    if target_square.is_occupied
-      moving_piece.team == 'white' ? black_graveyard.push(target_square.occupying_piece) : white_graveyard.push(target_square.occupying_piece)
-      # @graveyard.push(target_square.occupying_piece)
-      target_square.occupying_piece = moving_piece
-    else
-      target_square.occupying_piece = moving_piece
-      target_square.is_occupied = true
-    end
+    true
   end
 
   private
@@ -128,6 +145,16 @@ class Chess < GameBoard
     chess_board[1].each_with_index do |square, idx|
       square.occupying_piece = @black_pieces[1][idx]
       square.is_occupied = true
+    end
+  end
+
+  def gets_file_rank
+    loop do
+      input = gets.chomp.upcase
+
+      return input unless input.match(/[a-hA-H]{1}[1-8]{1}/).nil?
+
+      puts 'That position is invalid, enter another:'
     end
   end
 end

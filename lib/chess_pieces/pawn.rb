@@ -6,6 +6,7 @@ class Pawn
   include Convertable
 
   attr_reader :name, :team, :symbol
+  attr_accessor :moves_made
 
   def initialize(team)
     @name = 'pawn'
@@ -15,28 +16,37 @@ class Pawn
     @in_play = true
   end
 
-  def can_make_move?(start_pos, end_pos, curr_player)
-    start_index = convert_filerank_to_index(start_pos.position)
-    end_index = convert_filerank_to_index(end_pos.position)
+  def move_is_legal?(start_pos, end_pos, chess_board, curr_player)
+    start_indices = convert_filerank_to_index(start_pos.position)
+    end_indicies = convert_filerank_to_index(end_pos.position)
 
-    return false if start_index[1] != end_index[1]
+    return false unless moving_forwards?(start_indices, end_indicies, curr_player)
 
-    if @moves_made < 1
-      if curr_player == 'white'
-        start_index[0] - end_index[0] < 3
-      else
-        end_index[0] - start_index[0] < 3
-      end
+    if end_indicies[1] == start_indices[1] + 1 || end_indicies[1] == start_indices[1] - 1
+      valid_diagonal_move?(end_indicies, chess_board, curr_player) ? true : false
     else
-      if curr_player == 'white'
-        start_index[0] - end_index[0] == 1
-      else
-        end_index[0] - start_index[0] == 1
-      end
+      valid_vertical_move?(start_indices, end_indicies, curr_player) ? true : false
     end
   end
 
-  def blocked?(board_square, chess_board)
+  def moving_forwards?(start_indices, end_indices, curr_player)
+    curr_player == 'white' ? start_indices[0] > end_indices[0] : start_indices[0] < end_indices[0]
+  end
+
+  def valid_diagonal_move?(end_indicies, chess_board, curr_player)
+    target_square = chess_board[end_indicies[0]][end_indicies[1]]
+    target_square.is_occupied && target_square.occupying_piece.team != curr_player
+  end
+
+  def valid_vertical_move?(start_indices, end_indices, curr_player)
+    if curr_player == 'white'
+      @moves_made < 1 ? start_indices[0] - end_indices[0] <= 2 : start_indices[0] - end_indices[0] == 1
+    else
+      @moves_made < 1 ? end_indices[0] - start_indices[0] <= 2 : end_indices[0] - start_indices[0] == 1
+    end
+  end
+
+  def blocked_in?(board_square, chess_board)
     board_indicies = convert_filerank_to_index(board_square.position)
 
     if @team == 'white'
@@ -45,6 +55,10 @@ class Pawn
       return false if chess_board[board_indicies[0] + 1][board_indicies[1]].is_occupied == false
     end
 
+    true
+  end
+
+  def path_is_blocked?(_start_square, _target_square, _chess_board)
     true
   end
 end
