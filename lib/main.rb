@@ -8,17 +8,17 @@ chess_game.display_in_terminal
 white_turn = true
 current_player = white_turn ? 'white' : 'black'
 
-chess_game.gets_move_start_position(current_player)
+# p chess_game.chess_board[1][1].position[0]
 
-# 3.times do
-#   current_player = white_turn ? 'white' : 'black'
+5.times do
+  current_player = white_turn ? 'white' : 'black'
 
-#   s = chess_game.gets_starter_square(current_player)
-#   t = chess_game.gets_target_square(current_player, s)
+  s = chess_game.gets_move_start_position(current_player)
+  t = chess_game.gets_move_target_position
 
-#   chess_game.execute_move(s, t)
+  chess_game.execute_move(s, t)
 
-#   chess_game.display_in_terminal
+  chess_game.display_in_terminal
 
-#   white_turn = !white_turn
-# end
+  white_turn = !white_turn
+end
