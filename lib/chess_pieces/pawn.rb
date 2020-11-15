@@ -46,16 +46,36 @@ class Pawn
     end
   end
 
-  def blocked_in?(board_square, chess_board, _curr_player)
-    board_indicies = convert_filerank_to_index(board_square.position)
+  def blocked_in?(board_square, chess_board, curr_player_color)
+    current_position = board_square.position
+    row_index = gets_row_index(current_position)
+    column_index = gets_column_index(current_position)
 
-    if @color == 'white'
-      return false if chess_board[board_indicies[0] - 1][board_indicies[1]].is_occupied == false
+    if curr_player_color == 'white'
+      # square directly ahead is occupied
+      if chess_board[row_index - 1][column_index].is_occupied
+        # pawn is blocked unless it can capture diagonally forwards
+        can_move_diagonally?(row_index, column_index, chess_board, curr_player_color) ? true : false
+      end
     else
-      return false if chess_board[board_indicies[0] + 1][board_indicies[1]].is_occupied == false
+      # square directly ahead is occupied
+      if chess_board[row_index + 1][column_index].is_occupied
+        # pawn is blocked unless it can capture diagonally forwards
+        can_move_diagonally?(row_index, column_index, chess_board, curr_player_color) ? true : false
+      end
     end
+  end
 
-    true
+  def can_move_diagonally?(row_index, column_index, chess_board, curr_player_color)
+    forward_left = curr_player_color == 'white' ? chess_board[row_index - 1][column_index - 1] : chess_board[row_index + 1][column_index - 1]
+    forward_right = curr_player_color == 'white' ? chess_board[row_index - 1][column_index + 1] : chess_board[row_index + 1][column_index + 1]
+
+    # nil would indicate off board
+    if !forward_left.nil?
+      forward_left.is_occupied && forward_left.occupying_piece.color != curr_player_color ? true : false
+    elsif !forward_right.nil?
+      forward_right.is_occupied && forward_left.occupying_piece.color != curr_player_color ? true : false
+    end
   end
 
   def path_is_blocked?(_start_square, _target_square, _chess_board)

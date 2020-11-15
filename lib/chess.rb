@@ -82,13 +82,25 @@ class Chess < GameBoard
       elsif board_square.occupying_piece.color != curr_player_color
         puts 'The piece at that position belongs to the opposition, choose another:'
         next
-      elsif board_square.occupying_piece.blocked?(board_square, @chess_board, curr_player_color)
-        puts 'The piece at that position cannot currently move, choose another:'
+      elsif board_square.occupying_piece.blocked_in?(board_square, @chess_board, curr_player_color)
+        puts 'The piece at that position is currently blocked, choose another:'
         next
       end
 
       return board_square
     end
+  end
+
+  def gets_move_target_position
+    puts 'Enter the postion you want to move to:'
+
+    input = gets_file_rank
+
+    row_index = gets_row_index(input)
+    column_index = gets_column_index(input)
+    board_square = @chess_board[row_index][column_index]
+
+    board_square
   end
 
   private
