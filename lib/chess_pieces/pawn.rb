@@ -6,7 +6,7 @@ class Pawn
   include Convertable
 
   attr_reader :name, :color, :symbol
-  attr_accessor :moves_made
+  attr_writer :moves_made
 
   def initialize(color)
     @name = 'pawn'

@@ -56,7 +56,7 @@ class Chess < GameBoard
     if target_square.is_occupied
       captured_piece = target_square.occupying_piece
       captured_piece.in_play = false
-      moving_piece.team == 'white' ? @black_graveyard.push(captured_piece) : @white_graveyard.push(captured_piece)
+      moving_piece.color == 'white' ? @black_graveyard.push(captured_piece) : @white_graveyard.push(captured_piece)
       target_square.occupying_piece = moving_piece
     else
       target_square.occupying_piece = moving_piece
@@ -66,53 +66,29 @@ class Chess < GameBoard
     moving_piece.moves_made += 1
   end
 
-  def gets_starter_square(current_player)
-    puts 'Enter the position of the piece you want to move (e.g. A5):'
+  def gets_move_start_position(curr_player_color)
+    puts 'Enter the position of the piece you wish to move:'
 
     loop do
-      start_file_rank = gets_file_rank
+      input = gets_file_rank
 
-      board_indicies = convert_filerank_to_index(start_file_rank)
-      starter_square = @chess_board[board_indicies[0]][board_indicies[1]]
+      row_index = gets_row_index(input)
+      column_index = gets_column_index(input)
+      board_square = @chess_board[row_index][column_index]
 
-      return starter_square if valid_starter_square?(starter_square, current_player)
+      if !board_square.is_occupied
+        puts 'That position is empty, choose another:'
+        next
+      elsif board_square.occupying_piece.color != curr_player_color
+        puts 'The piece at that position belongs to the opposition, choose another:'
+        next
+      elsif board_square.occupying_piece.blocked?(board_square, @chess_board, curr_player_color)
+        puts 'The piece at that position cannot currently move, choose another:'
+        next
+      end
 
-      puts 'That postion is invalid, choose another:'
+      return board_square
     end
-  end
-
-  def gets_target_square(current_player, starter_square)
-    puts 'Enter the position of the square you want to move to:'
-
-    loop do
-      target_file_rank = gets_file_rank
-
-      board_indicies = convert_filerank_to_index(target_file_rank)
-      target_square = @chess_board[board_indicies[0]][board_indicies[1]]
-
-      return target_square if valid_target_square?(starter_square, target_square, current_player)
-
-      puts 'That move cannot be executed, choose another position:'
-    end
-  end
-
-  def valid_starter_square?(board_square, current_player)
-    return false if board_square.occupying_piece.nil?
-    return false if board_square.occupying_piece.color != current_player
-    return false if board_square.occupying_piece.blocked_in?(board_square, @chess_board, current_player)
-
-    true
-  end
-
-  def valid_target_square?(starter_square, target_square, current_player)
-    moving_piece = starter_square.occupying_piece
-
-    return false if target_square.is_occupied && target_square.occupying_piece.team == current_player
-    return false unless moving_piece.move_is_legal?(starter_square, target_square, @chess_board, current_player)
-
-    # return false if moving_piece.path_is_blocked?(starter_square, target_square, @chess_board)
-
-    true
   end
 
   private
