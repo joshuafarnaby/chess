@@ -76,6 +76,8 @@ class Chess < GameBoard
       column_index = gets_column_index(input)
       board_square = @chess_board[row_index][column_index]
 
+      # p board_square
+
       if !board_square.is_occupied
         puts 'That position is empty, choose another:'
         next
@@ -91,16 +93,33 @@ class Chess < GameBoard
     end
   end
 
-  def gets_move_target_position
+  def gets_move_target_position(start_move_square, curr_player_color)
     puts 'Enter the postion you want to move to:'
 
-    input = gets_file_rank
+    loop do
+      input = gets_file_rank
+      break if input == 'BREAK'
 
-    row_index = gets_row_index(input)
-    column_index = gets_column_index(input)
-    board_square = @chess_board[row_index][column_index]
+      row_index = gets_row_index(input)
+      column_index = gets_column_index(input)
+      target_board_square = @chess_board[row_index][column_index]
 
-    board_square
+      if start_move_square.position == target_board_square.position
+        puts 'You must move to a position different than where you started, choose another:'
+        next
+      elsif target_board_square.is_occupied && target_board_square.occupying_piece.color == curr_player_color
+        puts 'You cannot move to a position occupied by your own color, choose another:'
+        next
+      elsif !start_move_square.occupying_piece.can_legally_move?(start_move_square, target_board_square, @chess_board)
+        puts 'That move is not legal, choose another position:'
+        next
+        # elsif !start_move_square.occupying_piece.path_to_target_is_clear?(start_move_square, target_board_square)
+        #   puts 'The path for that move is blocked, choose another position:'
+        #   next
+      end
+
+      return target_board_square
+    end
   end
 
   private
@@ -142,6 +161,7 @@ class Chess < GameBoard
     loop do
       input = gets.chomp.upcase
 
+      return input if input == 'BREAK'
       return input unless input.match(/[a-hA-H]{1}[1-8]{1}/).nil?
 
       puts 'That position is invalid, enter another:'

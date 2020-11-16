@@ -16,34 +16,22 @@ class Pawn
     @in_play = true
   end
 
-  def move_is_legal?(start_pos, end_pos, chess_board, curr_player)
-    start_indices = convert_filerank_to_index(start_pos.position)
-    end_indicies = convert_filerank_to_index(end_pos.position)
+  def can_legally_move?(start_square, target_square, chess_board)
+    forward = set_forward(start_square, chess_board)
+    forward_double = set_forward_double(start_square, chess_board)
 
-    return false unless moving_forwards?(start_indices, end_indicies, curr_player)
+    forward_left = set_forward_left(start_square, chess_board)
+    forward_right = set_forward_right(start_square, chess_board)
 
-    if end_indicies[1] == start_indices[1] + 1 || end_indicies[1] == start_indices[1] - 1
-      valid_diagonal_move?(end_indicies, chess_board, curr_player) ? true : false
-    else
-      valid_vertical_move?(start_indices, end_indicies, curr_player) ? true : false
-    end
+    potential_moves = @moves_made == 0 ? [forward, forward_double, forward_left, forward_right] : [forward, forward_left, forward_right]
+
+    return false unless valid_target_square?(potential_moves, target_square)
+
+    true
   end
 
-  def moving_forwards?(start_indices, end_indices, curr_player)
-    curr_player == 'white' ? start_indices[0] > end_indices[0] : start_indices[0] < end_indices[0]
-  end
-
-  def valid_diagonal_move?(end_indicies, chess_board, curr_player)
-    target_square = chess_board[end_indicies[0]][end_indicies[1]]
-    target_square.is_occupied && target_square.occupying_piece.team != curr_player
-  end
-
-  def valid_vertical_move?(start_indices, end_indices, curr_player)
-    if curr_player == 'white'
-      @moves_made < 1 ? start_indices[0] - end_indices[0] <= 2 : start_indices[0] - end_indices[0] == 1
-    else
-      @moves_made < 1 ? end_indices[0] - start_indices[0] <= 2 : end_indices[0] - start_indices[0] == 1
-    end
+  def valid_target_square?(position_array, target_square)
+    position_array.one? { |square| square == target_square }
   end
 
   def blocked_in?(board_square, chess_board, curr_player_color)
@@ -74,16 +62,45 @@ class Pawn
 
     # nil would indicate off board
     if !forward_left.nil?
-      p forward_left
       forward_left.is_occupied && forward_left.occupying_piece.color != curr_player_color ? true : false
     elsif !forward_right.nil?
-      p forward_right
-      p curr_player_color
       forward_right.is_occupied && forward_right.occupying_piece.color != curr_player_color ? true : false
     end
   end
 
-  def path_is_blocked?(_start_square, _target_square, _chess_board)
-    true
+  def set_forward(start_square, chess_board)
+    color = start_square.occupying_piece.color
+    row_index = gets_row_index(start_square.position)
+    column_index = gets_column_index(start_square.position)
+
+    color == 'white' ? chess_board[row_index - 1][column_index] : chess_board[row_index + 1][column_index]
+  end
+
+  def set_forward_double(start_square, chess_board)
+    color = start_square.occupying_piece.color
+    row_index = gets_row_index(start_square.position)
+    column_index = gets_column_index(start_square.position)
+
+    color == 'white' ? chess_board[row_index - 2][column_index] : chess_board[row_index + 2][column_index]
+  end
+
+  def set_forward_left(start_square, chess_board)
+    color = start_square.occupying_piece.color
+    row_index = gets_row_index(start_square.position)
+    column_index = gets_column_index(start_square.position)
+
+    return nil if column_index == 0 && color == 'white'
+
+    color == 'white' ? chess_board[row_index - 1][column_index - 1] : chess_board[row_index + 1][column_index + 1]
+  end
+
+  def set_forward_right(start_square, chess_board)
+    color = start_square.occupying_piece.color
+    row_index = gets_row_index(start_square.position)
+    column_index = gets_column_index(start_square.position)
+
+    return nil if column_index == 0 && color == 'black'
+
+    color == 'white' ? chess_board[row_index - 1][column_index + 1] : chess_board[row_index + 1][column_index - 1]
   end
 end
