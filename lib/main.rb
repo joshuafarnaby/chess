@@ -10,7 +10,7 @@ current_player = white_turn ? 'white' : 'black'
 
 # p chess_game.chess_board[1][1].position[0]
 
-3.times do
+4.times do
   current_player = white_turn ? 'white' : 'black'
 
   s = chess_game.gets_move_start_position(current_player)

@@ -27,6 +27,20 @@ class Pawn
 
     return false unless valid_target_square?(potential_moves, target_square)
 
+    if target_square == forward
+      return false if forward.is_occupied
+    elsif target_square == forward_double
+      return false unless !forward_double.is_occupied && !forward.is_occupied
+    elsif target_square == forward_left
+      unless forward_left.is_occupied && forward_left.occupying_piece.color != start_square.occupying_piece.color
+        return false
+      end
+    elsif target_square == forward_right
+      unless forward_right.is_occupied && forward_right.occupying_piece.color != start_square.occupying_piece.color
+        return false
+      end
+    end
+
     true
   end
 
