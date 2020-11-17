@@ -80,7 +80,7 @@ class Chess < GameBoard
     end
   end
 
-  def gets_move_target_position(start_move_square, curr_player_color)
+  def gets_move_target_position(start_move_square, _curr_player_color)
     puts 'Enter the postion you want to move to:'
 
     loop do
@@ -91,18 +91,7 @@ class Chess < GameBoard
       column_index = gets_column_index(input)
       target_board_square = @chess_board[row_index][column_index]
 
-      if start_move_square.position == target_board_square.position
-        puts 'You must move to a position different than where you started, choose another:'
-        next
-      elsif target_board_square.is_occupied && target_board_square.occupying_piece.color == curr_player_color
-        puts 'You cannot move to a position occupied by your own color, choose another:'
-        next
-      elsif !start_move_square.occupying_piece.can_legally_move?(start_move_square, target_board_square, @chess_board)
-        puts 'That move is not legal, choose another position:'
-        next
-      end
-
-      return target_board_square
+      return target_board_square if valid_target_square?(start_move_square, target_board_square)
     end
   end
 
@@ -113,10 +102,27 @@ class Chess < GameBoard
       puts 'That position is empty, choose another:'
       return false
     elsif board_square.occupying_piece.color != color
-      puts 'The piece at that position belongs to the opposition, choose another:'
+      puts "That #{board_square.occupying_piece.name} belongs to the opposition, choose another:"
       return false
     elsif board_square.occupying_piece.blocked_in?(board_square, @chess_board)
-      puts 'The piece at that position is currently blocked, choose another:'
+      puts "The #{board_square.occupying_piece.name} at that position is currently blocked, choose another:"
+      return false
+    end
+
+    true
+  end
+
+  def valid_target_square?(start_square, target_square)
+    current_color = start_square.occupying_piece.color
+
+    if start_square.position == target_square.position
+      puts 'You must move to a different position, choose another:'
+      return false
+    elsif target_square.is_occupied && target_square.occupying_piece.color == current_color
+      puts 'You cannot move to a position occupied by your own color, choose another:'
+      return false
+    elsif !start_square.occupying_piece.legal_move?(start_square, target_square, @chess_board)
+      puts "A #{start_square.occupying_piece.name} cannot legally move to that position, choose another"
       return false
     end
 

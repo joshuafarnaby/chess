@@ -16,36 +16,48 @@ class Pawn
     @in_play = true
   end
 
-  def can_legally_move?(start_square, target_square, chess_board)
-    forward = set_forward(start_square, chess_board)
-    forward_double = set_forward_double(start_square, chess_board)
+  def legal_move?(start_square, target_square, chess_board)
+    potential_moves_array = determine_potential_next_positions(start_square, chess_board)
 
-    forward_left = set_forward_left(start_square, chess_board)
-    forward_right = set_forward_right(start_square, chess_board)
+    return false unless valid_target_square?(potential_moves_array, target_square)
 
-    potential_moves = @moves_made == 0 ? [forward, forward_double, forward_left, forward_right] : [forward, forward_left, forward_right]
+    move_is_possible?(start_square, target_square, potential_moves_array)
+  end
 
-    return false unless valid_target_square?(potential_moves, target_square)
+  def move_is_possible?(start_square, target_square, potential_moves_array)
+    forward = potential_moves_array[0]
+    forward_left = potential_moves_array[1]
+    forward_right = potential_moves_array[2]
+    forward_double = potential_moves_array[3] if potential_moves_array.length == 4
 
     if target_square == forward
       return false if forward.is_occupied
     elsif target_square == forward_double
       return false unless !forward_double.is_occupied && !forward.is_occupied
-    elsif target_square == forward_left
-      unless forward_left.is_occupied && forward_left.occupying_piece.color != start_square.occupying_piece.color
-        return false
-      end
-    elsif target_square == forward_right
-      unless forward_right.is_occupied && forward_right.occupying_piece.color != start_square.occupying_piece.color
-        return false
-      end
+    else
+      return possible_diagonal_move?(start_square, target_square, forward_left, forward_right)
     end
 
     true
   end
 
-  def valid_target_square?(position_array, target_square)
-    position_array.one? { |square| square == target_square }
+  def possible_diagonal_move?(start_square, target_square, forward_left, forward_right)
+    if target_square == forward_left
+      forward_left.is_occupied && forward_left.occupying_piece.color != start_square.occupying_piece.color
+    else
+      forward_right.is_occupied && forward_right.occupying_piece.color != start_square.occupying_piece.color
+    end
+  end
+
+  def determine_potential_next_positions(start_square, chess_board)
+    forward = set_forward(start_square, chess_board)
+    forward_left = set_forward_left(start_square, chess_board)
+    forward_right = set_forward_right(start_square, chess_board)
+
+    return [forward, forward_left, forward_right] if @moves_made > 0
+
+    forward_double = set_forward_double(start_square, chess_board)
+    [forward, forward_left, forward_right, forward_double]
   end
 
   def blocked_in?(board_square, chess_board)
@@ -69,6 +81,10 @@ class Pawn
 
       potential_square.is_occupied && potential_square.occupying_piece.color != current_color
     end
+  end
+
+  def valid_target_square?(position_array, target_square)
+    position_array.one? { |square| square == target_square }
   end
 
   def set_forward(start_square, chess_board)
