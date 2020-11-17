@@ -48,37 +48,26 @@ class Pawn
     position_array.one? { |square| square == target_square }
   end
 
-  def blocked_in?(board_square, chess_board, curr_player_color)
-    current_position = board_square.position
-    row_index = gets_row_index(current_position)
-    column_index = gets_column_index(current_position)
+  def blocked_in?(board_square, chess_board)
+    forward_square = set_forward(board_square, chess_board)
 
-    square_directly_ahead = curr_player_color == 'white' ? chess_board[row_index - 1][column_index] : chess_board[row_index + 1][column_index]
+    if forward_square.is_occupied
+      forward_left = set_forward_left(board_square, chess_board)
+      forward_right = set_forward_right(board_square, chess_board)
 
-    # square ahead is empty - forward move can be exectued
-    return false unless square_directly_ahead.is_occupied
-
-    if square_directly_ahead.is_occupied
-      # check if a diagonal move can be executed
-      # if this method returns true a diagonal move can be made - so we return the opposite
-      can_move_diagonally?(row_index, column_index, chess_board, curr_player_color) ? false : true
+      !can_move_diagonally?(board_square, forward_left, forward_right)
+    else
+      false
     end
   end
 
-  def can_move_diagonally?(row_index, column_index, chess_board, curr_player_color)
-    forward_left = curr_player_color == 'white' ? chess_board[row_index - 1][column_index - 1] : chess_board[row_index + 1][column_index + 1]
-    forward_right = curr_player_color == 'white' ? chess_board[row_index - 1][column_index + 1] : chess_board[row_index + 1][column_index - 1]
+  def can_move_diagonally?(board_square, forward_left, forward_right)
+    current_color = board_square.occupying_piece.color
 
-    if chess_board[row_index][column_index].position[0] == 'A'
-      # temp solution to (col index - 1) wrapping to column H and not nil
-      curr_player_color == 'white' ? forward_left = nil : forward_right = nil
-    end
+    [forward_left, forward_right].one? do |potential_square|
+      next if potential_square.nil?
 
-    # nil would indicate off board
-    if !forward_left.nil?
-      forward_left.is_occupied && forward_left.occupying_piece.color != curr_player_color ? true : false
-    elsif !forward_right.nil?
-      forward_right.is_occupied && forward_right.occupying_piece.color != curr_player_color ? true : false
+      potential_square.is_occupied && potential_square.occupying_piece.color != current_color
     end
   end
 

@@ -76,20 +76,7 @@ class Chess < GameBoard
       column_index = gets_column_index(input)
       board_square = @chess_board[row_index][column_index]
 
-      # p board_square
-
-      if !board_square.is_occupied
-        puts 'That position is empty, choose another:'
-        next
-      elsif board_square.occupying_piece.color != curr_player_color
-        puts 'The piece at that position belongs to the opposition, choose another:'
-        next
-      elsif board_square.occupying_piece.blocked_in?(board_square, @chess_board, curr_player_color)
-        puts 'The piece at that position is currently blocked, choose another:'
-        next
-      end
-
-      return board_square
+      return board_square if valid_start_position?(board_square, curr_player_color)
     end
   end
 
@@ -113,9 +100,6 @@ class Chess < GameBoard
       elsif !start_move_square.occupying_piece.can_legally_move?(start_move_square, target_board_square, @chess_board)
         puts 'That move is not legal, choose another position:'
         next
-        # elsif !start_move_square.occupying_piece.path_to_target_is_clear?(start_move_square, target_board_square)
-        #   puts 'The path for that move is blocked, choose another position:'
-        #   next
       end
 
       return target_board_square
@@ -123,6 +107,21 @@ class Chess < GameBoard
   end
 
   private
+
+  def valid_start_position?(board_square, color)
+    if !board_square.is_occupied
+      puts 'That position is empty, choose another:'
+      return false
+    elsif board_square.occupying_piece.color != color
+      puts 'The piece at that position belongs to the opposition, choose another:'
+      return false
+    elsif board_square.occupying_piece.blocked_in?(board_square, @chess_board)
+      puts 'The piece at that position is currently blocked, choose another:'
+      return false
+    end
+
+    true
+  end
 
   def initialize_chess_board
     chess_board = create_board(@files, @ranks)
