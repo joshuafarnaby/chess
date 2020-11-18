@@ -56,14 +56,14 @@ class Chess < GameBoard
     execute_move(positions[0], positions[1])
   end
 
+  private
+
   def gets_positions(color)
     loop do
       positions = gets_player_input.split('/')
 
       start = get_corresponding_square(positions[0])
       target = get_corresponding_square(positions[1])
-
-      p [start, target]
 
       return [start, target] if valid_start_position?(start, color) && valid_target_position?(start, target)
     end
@@ -107,37 +107,6 @@ class Chess < GameBoard
 
     moving_piece.moves_made += 1
   end
-
-  # def gets_move_start_position(curr_player_color)
-  #   puts 'Enter the position of the piece you wish to move:'
-
-  #   loop do
-  #     input = gets_file_rank
-
-  #     row_index = gets_row_index(input)
-  #     column_index = gets_column_index(input)
-  #     board_square = @chess_board[row_index][column_index]
-
-  #     return board_square if valid_start_position?(board_square, curr_player_color)
-  #   end
-  # end
-
-  # def gets_move_target_position(start_move_square, _curr_player_color)
-  #   puts 'Enter the postion you want to move to:'
-
-  #   loop do
-  #     input = gets_file_rank
-  #     break if input == 'BREAK'
-
-  #     row_index = gets_row_index(input)
-  #     column_index = gets_column_index(input)
-  #     target_board_square = @chess_board[row_index][column_index]
-
-  #     return target_board_square if valid_target_square?(start_move_square, target_board_square)
-  #   end
-  # end
-
-  private
 
   def valid_start_position?(board_square, color)
     if !board_square.is_occupied
@@ -203,15 +172,4 @@ class Chess < GameBoard
       square.is_occupied = true
     end
   end
-
-  # def gets_file_rank
-  #   loop do
-  #     input = gets.chomp.upcase
-
-  #     return input if input == 'BREAK'
-  #     return input unless input.match(/[a-hA-H]{1}[1-8]{1}/).nil?
-
-  #     puts 'That position is invalid, enter another:'
-  #   end
-  # end
 end
