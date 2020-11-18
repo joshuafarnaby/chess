@@ -6,19 +6,21 @@ chess_game = Chess.new
 chess_game.display_in_terminal
 
 white_turn = true
-current_player = white_turn ? 'white' : 'black'
+current_color = white_turn ? 'white' : 'black'
 
-# p chess_game.chess_board[1][1].position[0]
+chess_game.take_turn(current_color)
 
-4.times do
-  current_player = white_turn ? 'white' : 'black'
+chess_game.display_in_terminal
 
-  s = chess_game.gets_move_start_position(current_player)
-  t = chess_game.gets_move_target_position(s, current_player)
+# 4.times do
+#   current_player = white_turn ? 'white' : 'black'
 
-  chess_game.execute_move(s, t)
+#   s = chess_game.gets_move_start_position(current_player)
+#   t = chess_game.gets_move_target_position(s, current_player)
 
-  chess_game.display_in_terminal
+#   chess_game.execute_move(s, t)
 
-  white_turn = !white_turn
-end
+#   chess_game.display_in_terminal
+
+#   white_turn = !white_turn
+# end
