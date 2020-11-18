@@ -116,7 +116,7 @@ class Chess < GameBoard
     return false unless correct_piece_color?(board_square, color, position)
 
     if board_square.occupying_piece.blocked_in?(board_square, @chess_board)
-      puts "The #{board_square.occupying_piece.name} at #{position} is currently blocked, choose another:"
+      puts "The #{board_square.occupying_piece.name} at #{position} is currently blocked, make another move:"
       return false
     end
 
@@ -161,7 +161,7 @@ class Chess < GameBoard
     piece_at_target = target_square.occupying_piece
 
     if color == piece_at_target.color
-      puts "You cannot move to #{target_position} because the #{piece_at_target} there is your own color, choose another:"
+      puts "You cannot move to #{target_position} because the #{piece_at_target.name} there is your own color, choose another:"
       true
     else
       false

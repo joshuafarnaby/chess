@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/convertable.rb'
+require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/gettable.rb'
 
 class Rook
   include Convertable
+  include Gettable
 
   attr_reader :name, :color, :symbol
   attr_accessor :moves_made
@@ -16,31 +18,67 @@ class Rook
     @moves_made = 0
   end
 
-  def move_is_legal?(_start_pos, _end_pos, _chess_board, _current_player)
-    true
+  def legal_move?(start, target, chess_board)
+    return false unless same_rank?(start, target) || same_file?(start, target)
+
+    path_is_clear?(start, target, chess_board)
   end
 
-  def blocked_in?(board_square, chess_board, curr_player)
-    p 'here'
+  def blocked_in?(start_square, chess_board)
+    adjacent_squares_arr = get_hv_adjacents(start_square, chess_board).filter! { |square| !square.nil? }
 
-    blocked = true
-
-    adjacents = [[-1, 0], [0, 1], [+1, 0], [0, -1]]
-    index_of_rook = convert_filerank_to_index(board_square.position)
-
-    adjacents.each do |element|
-      adjacent_index = [index_of_rook[0] + element[0], index_of_rook[1] + element[1]]
-
-      p adjacent_index
-
-      next if adjacent_index.any? { |val| val.negative? || val > 7 }
-
-      position_on_board = chess_board[adjacent_index[0]][adjacent_index[1]]
-
-      blocked = false unless position_on_board.is_occupied
-      blocked = false if position_on_board.is_occupied && position_on_board.occupying_piece.color != curr_player
+    adjacent_squares_arr.all? do |square|
+      square.is_occupied && square.occupying_piece.color == start_square.occupying_piece.color
     end
+  end
 
-    blocked
+  def path_is_clear?(start, target, chess_board)
+    path_to_target = path_to_target(start, target, chess_board)
+
+    # p path_to_target
+
+    path_to_target.all? { |square| !square.is_occupied }
+  end
+
+  def path_to_target(start, target, chess_board)
+    same_rank?(start, target) ? horizontal_path(start, target, chess_board) : vertical_path(start, target, chess_board)
+  end
+
+  def horizontal_path(start, target, chess_board, path_arr = [])
+    start_row_index = gets_row_index(start.position)
+    start_column_index = gets_column_index(start.position)
+    target_columm_index = gets_column_index(target.position)
+
+    next_column_index = start_column_index > target_columm_index ? start_column_index - 1 : start_column_index + 1
+    next_square = chess_board[start_row_index][next_column_index]
+
+    return path_arr if next_square == target
+
+    path_arr.push(next_square)
+
+    horizontal_path(next_square, target, chess_board, path_arr)
+  end
+
+  def vertical_path(start, target, chess_board, path_arr = [])
+    start_row_index = gets_row_index(start.position)
+    start_column_index = gets_column_index(start.position)
+    target_row_index = gets_row_index(target.position)
+
+    next_row_index = start_row_index > target_row_index ? start_row_index - 1 : start_row_index + 1
+    next_square = chess_board[next_row_index][start_column_index]
+
+    return path_arr if next_square == target
+
+    path_arr.push(next_square)
+
+    vertical_path(next_square, target, chess_board, path_arr)
+  end
+
+  def same_rank?(start, target)
+    start.position[1] == target.position[1]
+  end
+
+  def same_file?(start, target)
+    start.position[0] == target.position[0]
   end
 end

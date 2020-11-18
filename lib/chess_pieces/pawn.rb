@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/convertable.rb'
+require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/gettable.rb'
 
 class Pawn
   include Convertable
+  include Gettable
 
   attr_reader :name, :color, :symbol
   attr_accessor :moves_made, :in_play
@@ -50,22 +52,22 @@ class Pawn
   end
 
   def determine_potential_next_positions(start_square, chess_board)
-    forward = set_forward(start_square, chess_board)
-    forward_left = set_forward_left(start_square, chess_board)
-    forward_right = set_forward_right(start_square, chess_board)
+    forward = get_forward(start_square, chess_board)
+    forward_left = get_forward_left(start_square, chess_board)
+    forward_right = get_forward_right(start_square, chess_board)
 
     return [forward, forward_left, forward_right] if @moves_made > 0
 
-    forward_double = set_forward_double(start_square, chess_board)
+    forward_double = get_forward_double(start_square, chess_board)
     [forward, forward_left, forward_right, forward_double]
   end
 
   def blocked_in?(board_square, chess_board)
-    forward_square = set_forward(board_square, chess_board)
+    forward_square = get_forward(board_square, chess_board)
 
     if forward_square.is_occupied
-      forward_left = set_forward_left(board_square, chess_board)
-      forward_right = set_forward_right(board_square, chess_board)
+      forward_left = get_forward_left(board_square, chess_board)
+      forward_right = get_forward_right(board_square, chess_board)
 
       !can_move_diagonally?(board_square, forward_left, forward_right)
     else
@@ -85,41 +87,5 @@ class Pawn
 
   def valid_target_square?(position_array, target_square)
     position_array.one? { |square| square == target_square }
-  end
-
-  def set_forward(start_square, chess_board)
-    color = start_square.occupying_piece.color
-    row_index = gets_row_index(start_square.position)
-    column_index = gets_column_index(start_square.position)
-
-    color == 'white' ? chess_board[row_index - 1][column_index] : chess_board[row_index + 1][column_index]
-  end
-
-  def set_forward_double(start_square, chess_board)
-    color = start_square.occupying_piece.color
-    row_index = gets_row_index(start_square.position)
-    column_index = gets_column_index(start_square.position)
-
-    color == 'white' ? chess_board[row_index - 2][column_index] : chess_board[row_index + 2][column_index]
-  end
-
-  def set_forward_left(start_square, chess_board)
-    color = start_square.occupying_piece.color
-    row_index = gets_row_index(start_square.position)
-    column_index = gets_column_index(start_square.position)
-
-    return nil if column_index == 0 && color == 'white'
-
-    color == 'white' ? chess_board[row_index - 1][column_index - 1] : chess_board[row_index + 1][column_index + 1]
-  end
-
-  def set_forward_right(start_square, chess_board)
-    color = start_square.occupying_piece.color
-    row_index = gets_row_index(start_square.position)
-    column_index = gets_column_index(start_square.position)
-
-    return nil if column_index == 0 && color == 'black'
-
-    color == 'white' ? chess_board[row_index - 1][column_index + 1] : chess_board[row_index + 1][column_index - 1]
   end
 end

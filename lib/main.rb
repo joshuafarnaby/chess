@@ -7,7 +7,7 @@ chess_game.display_in_terminal
 
 white_turn = true
 
-4.times do
+6.times do
   current_color = white_turn ? 'white' : 'black'
 
   chess_game.take_turn(current_color)
@@ -16,3 +16,13 @@ white_turn = true
 
   white_turn = !white_turn
 end
+
+# def collect_numbers(num, arr = [])
+#   return arr if num < 1
+
+#   arr.push(num)
+
+#   collect_numbers(num - 1, arr)
+# end
+
+# p collect_numbers(10)
