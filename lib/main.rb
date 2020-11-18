@@ -11,7 +11,7 @@ white_turn = true
   current_color = white_turn ? 'white' : 'black'
 
   chess_game.take_turn(current_color)
-  
+
   chess_game.display_in_terminal
 
   white_turn = !white_turn

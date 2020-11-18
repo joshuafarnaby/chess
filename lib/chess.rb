@@ -77,6 +77,7 @@ class Chess < GameBoard
     loop do
       input = gets.chomp.upcase
 
+      break if input == 'break'
       return input unless input.match(%r{^[A-H]{1}[1-8]{1}/[A-H]{1}[1-8]{1}$}i).nil?
 
       puts 'That input is not recognised, try again:'
@@ -109,14 +110,13 @@ class Chess < GameBoard
   end
 
   def valid_start_position?(board_square, color)
-    if !board_square.is_occupied
-      puts 'That position is empty, choose another:'
-      return false
-    elsif board_square.occupying_piece.color != color
-      puts "That #{board_square.occupying_piece.name} belongs to the opposition, choose another:"
-      return false
-    elsif board_square.occupying_piece.blocked_in?(board_square, @chess_board)
-      puts "The #{board_square.occupying_piece.name} at that position is currently blocked, choose another:"
+    position = board_square.position
+
+    return false unless start_position_occupied?(board_square, position)
+    return false unless correct_piece_color?(board_square, color, position)
+
+    if board_square.occupying_piece.blocked_in?(board_square, @chess_board)
+      puts "The #{board_square.occupying_piece.name} at #{position} is currently blocked, choose another:"
       return false
     end
 
@@ -126,18 +126,58 @@ class Chess < GameBoard
   def valid_target_position?(start_square, target_square)
     current_color = start_square.occupying_piece.color
 
-    if start_square.position == target_square.position
-      puts 'You must move to a different position, choose another:'
-      return false
-    elsif target_square.is_occupied && target_square.occupying_piece.color == current_color
-      puts 'You cannot move to a position occupied by your own color, choose another:'
-      return false
-    elsif !start_square.occupying_piece.legal_move?(start_square, target_square, @chess_board)
-      puts "A #{start_square.occupying_piece.name} cannot legally move to that position, choose another"
+    return false if same_position?(start_square, target_square)
+    return false if target_square.is_occupied && same_color_at_target?(current_color, target_square)
+
+    unless start_square.occupying_piece.legal_move?(start_square, target_square, @chess_board)
+      puts "A #{start_square.occupying_piece.name} cannot legally move to that position, choose another:"
       return false
     end
 
     true
+  end
+
+  def start_position_occupied?(board_square, position)
+    return true if board_square.is_occupied
+
+    puts "#{position} is currently empty, you must choose an occupied start position:"
+
+    false
+  end
+
+  def correct_piece_color?(board_square, color, position)
+    start_piece_color = board_square.occupying_piece.color
+    piece = board_square.occupying_piece.name
+
+    return true if start_piece_color == color
+
+    puts "The #{piece} at #{position} belongs to the opposition, select a position occupied by your color:"
+
+    false
+  end
+
+  def same_color_at_target?(color, target_square)
+    target_position = target_square.position
+    piece_at_target = target_square.occupying_piece
+
+    if color == piece_at_target.color
+      puts "You cannot move to #{target_position} because the #{piece_at_target} there is your own color, choose another:"
+      true
+    else
+      false
+    end
+  end
+
+  def same_position?(start_square, target_square)
+    start_position = start_square.position
+    target_position = target_square.position
+
+    if start_position == target_position
+      puts "You must move away from #{start_position}, choose another position that is not #{target_position}:"
+      true
+    else
+      false
+    end
   end
 
   def initialize_chess_board
