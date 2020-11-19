@@ -35,8 +35,6 @@ class Knight
     color = start.occupying_piece.color
     reachable_positions = generate_reachable_positions(start, chess_board)
 
-    p reachable_positions
-
     reachable_positions.one? do |position|
       !position.is_occupied || (position.is_occupied && position.occupying_piece.color != color) if position == target
     end
@@ -45,8 +43,6 @@ class Knight
   def generate_reachable_positions(square, chess_board, reachable_positions = [])
     current_row_idx = gets_row_index(square.position)
     current_column_idx = gets_column_index(square.position)
-
-    p [current_row_idx, current_column_idx]
 
     MOVE_LIST.each do |sub_arr|
       new_row_idx = current_row_idx + sub_arr[0]
