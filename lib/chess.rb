@@ -92,9 +92,7 @@ class Chess < GameBoard
   end
 
   def execute_move(starting_square, target_square)
-    moving_piece = starting_square.occupying_piece
-
-    starting_square.reset
+    moving_piece = starting_square.reset
 
     if target_square.is_occupied
       captured_piece = target_square.occupying_piece
