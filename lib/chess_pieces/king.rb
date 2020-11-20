@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 class King
-  attr_reader :name, :team, :symbol
+  attr_reader :name, :color, :symbol
 
-  def initialize(team)
+  def initialize(color)
     @name = 'king'
-    @team = team
+    @color = color
     @symbol = @team == 'white' ? "\u2654" : "\u265A"
     @in_play = true
   end
