@@ -64,17 +64,9 @@ class Queen
     end
   end
 
-  def build_path(start, target, chess_board, index_adjustment)
-    if same_file?(start, target) || same_rank?(start, target)
-      build_straight_path(start, target, chess_board, index_adjustment)
-    else
-      build_diagonal_path(start, target, chess_board, index_adjustment)
-    end
-  end
-
-  def build_straight_path(start, target, chess_board, array, path = [])
-    next_row_index = gets_row_index(start.position) + array[0]
-    next_column_index = gets_column_index(start.position) + array[1]
+  def build_path(start, target, chess_board, index_adjustment, path = [])
+    next_row_index = gets_row_index(start.position) + index_adjustment[0]
+    next_column_index = gets_column_index(start.position) + index_adjustment[1]
 
     next_position = chess_board[next_row_index][next_column_index]
 
@@ -82,23 +74,7 @@ class Queen
 
     path.push(next_position)
 
-    build_straight_path(next_position, target, chess_board, array, path)
-  end
-
-  def build_diagonal_path(start, target, chess_board, array, path = [])
-    start_indicies = [gets_row_index(start.position), gets_column_index(start.position)]
-
-    distance = 1
-
-    loop do
-      next_row_index = start_indicies[0] + (array[0] * distance)
-      next_column_index = start_indicies[1] + (array[1] * distance)
-
-      return path if chess_board[next_row_index][next_column_index] == target
-
-      path.push(chess_board[next_row_index][next_column_index])
-      distance += 1
-    end
+    build_path(next_position, target, chess_board, index_adjustment, path)
   end
 
   def evaluate_diagonal_path(start_indicies, target_indicies)
