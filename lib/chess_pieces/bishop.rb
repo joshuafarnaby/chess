@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/blockable.rb'
+require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/pathable.rb'
 
 class Bishop
   include Blockable
+  include Pathable
 
   DIRECT_ADJACENT = [
     [-1, 1],
@@ -25,91 +27,23 @@ class Bishop
 
   def blocked_in?(start, chess_board)
     blocked?(DIRECT_ADJACENT, start, chess_board)
-
-    # color = start.occupying_piece.color
-    # adjacent_positions = generate_adjacent_positions(start, chess_board)
-
-    # adjacent_positions.all? do |position|
-    #   position.is_occupied && position.occupying_piece.color == color
-    # end
   end
 
   def legal_move?(start, target, chess_board)
-    return true if generate_adjacent_positions(start, chess_board).one? do |position|
-      position == target
-    end
-
-    evaluate_path(start, target, chess_board)
+    target_position_valid?(start, target) && path_is_clear?(start, target, chess_board)
   end
 
   private
 
-  def evaluate_path(start, target, chess_board)
-    path = move_path(start, target, chess_board)
+  def path_is_clear?(start, target, chess_board)
+    index_adjustment = evaluate_diagonal_path(start, target)
 
-    # p path
+    path_to_target = build_path(start, target, chess_board, index_adjustment)
 
-    !path.nil? && path_is_clear?(path)
+    path_to_target.all? { |position| !position.is_occupied }
   end
 
-  def move_path(start, target, chess_board)
-    DIRECT_ADJACENT.each do |array|
-      path = build_path(start, target, chess_board, array)
-
-      p path
-
-      return path unless path.nil?
-    end
-
-    nil
-  end
-
-  def build_path(start, target, chess_board, array)
-    current_row_index = gets_row_index(start.position)
-    current_column_index = gets_column_index(start.position)
-
-    path = []
-    iteration_counter = 1
-
-    loop do
-      next_row_index = current_row_index + (array[0] * iteration_counter)
-      next_column_index = current_column_index + (array[1] * iteration_counter)
-
-      break if invalid_indices?(next_row_index, next_column_index)
-
-      return path if chess_board[next_row_index][next_column_index] == target
-
-      path.push(chess_board[next_row_index][next_column_index])
-      iteration_counter += 1
-    end
-
-    nil
-  end
-
-  def path_is_clear?(path)
-    path.all? { |position| !position.is_occupied }
-  end
-
-  def generate_adjacent_positions(start, chess_board, adjacents = [])
-    current_row_index = gets_row_index(start.position)
-    current_column_index = gets_column_index(start.position)
-
-    DIRECT_ADJACENT.each do |array|
-      adj_row_index = current_row_index + array[0]
-      adj_column_index = current_column_index + array[1]
-
-      next if invalid_indices?(adj_row_index, adj_column_index)
-
-      adjacents.push(chess_board[adj_row_index][adj_column_index])
-    end
-
-    adjacents
-  end
-
-  def invalid_indices?(row_index, column_index)
-    return true if row_index > 7 || column_index > 7
-    return true if row_index < 0 || column_index < 0
-
-    false
+  def target_position_valid?(start, target)
+    diagonally?(start, target)
   end
 end
