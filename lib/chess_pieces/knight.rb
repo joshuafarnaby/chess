@@ -44,7 +44,7 @@ class Knight
     reachable_positions = get_direct_adjacents(MOVE_LIST, start, chess_board)
 
     reachable_positions.one? do |position|
-      position == target && (!target.is_occupied || target.is_occupied && target.occupying_piece.color != color)
+      position == target && (!position.is_occupied || position.is_occupied && position.occupying_piece.color != color)
     end
   end
 end
