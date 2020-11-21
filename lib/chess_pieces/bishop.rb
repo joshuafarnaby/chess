@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
-require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/convertable.rb'
-require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/gettable.rb'
+require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/blockable.rb'
 
 class Bishop
-  include Convertable
+  include Blockable
 
   DIRECT_ADJACENT = [
     [-1, 1],
@@ -25,12 +24,14 @@ class Bishop
   end
 
   def blocked_in?(start, chess_board)
-    color = start.occupying_piece.color
-    adjacent_positions = generate_adjacent_positions(start, chess_board)
+    blocked?(DIRECT_ADJACENT, start, chess_board)
 
-    adjacent_positions.all? do |position|
-      position.is_occupied && position.occupying_piece.color == color
-    end
+    # color = start.occupying_piece.color
+    # adjacent_positions = generate_adjacent_positions(start, chess_board)
+
+    # adjacent_positions.all? do |position|
+    #   position.is_occupied && position.occupying_piece.color == color
+    # end
   end
 
   def legal_move?(start, target, chess_board)

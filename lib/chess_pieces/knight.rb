@@ -40,13 +40,12 @@ class Knight
     end
   end
 
-  def generate_reachable_positions(square, chess_board, reachable_positions = [])
-    current_row_idx = gets_row_index(square.position)
-    current_column_idx = gets_column_index(square.position)
+  private
 
+  def generate_reachable_positions(start, chess_board, reachable_positions = [])
     MOVE_LIST.each do |sub_arr|
-      new_row_idx = current_row_idx + sub_arr[0]
-      new_column_idx = current_column_idx + sub_arr[1]
+      new_row_idx = start.row_index + sub_arr[0]
+      new_column_idx = start.column_index + sub_arr[1]
 
       next if invalid_positions?(new_row_idx, new_column_idx)
 
@@ -57,9 +56,6 @@ class Knight
   end
 
   def invalid_positions?(new_row_idx, new_column_idx)
-    return true if new_row_idx > 7 || new_column_idx > 7
-    return true if new_row_idx < 0 || new_column_idx < 0
-
-    false
+    (new_row_idx > 7 || new_column_idx > 7) || (new_row_idx < 0 || new_column_idx < 0)
   end
 end

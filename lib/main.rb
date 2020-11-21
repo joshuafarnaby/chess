@@ -16,13 +16,3 @@ white_turn = true
 
   white_turn = !white_turn
 end
-
-# def collect_numbers(num, arr = [])
-#   return arr if num < 1
-
-#   arr.push(num)
-
-#   collect_numbers(num - 1, arr)
-# end
-
-# p collect_numbers(10)
