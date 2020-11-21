@@ -49,11 +49,11 @@ class Queen
   end
 
   def determine_direction(start, target)
-    start_row_index =  gets_row_index(start.position)
-    start_column_index = gets_column_index(start.position)
+    start_row_index =  start.row_index
+    start_column_index = start.column_index
 
-    target_row_index = gets_row_index(target.position)
-    target_column_index = gets_column_index(target.position)
+    target_row_index = target.row_index
+    target_column_index = target.column_index
 
     if same_file?(start, target)
       start_row_index > target_row_index ? [-1, 0] : [1, 0]
@@ -65,8 +65,8 @@ class Queen
   end
 
   def build_path(start, target, chess_board, index_adjustment, path = [])
-    next_row_index = gets_row_index(start.position) + index_adjustment[0]
-    next_column_index = gets_column_index(start.position) + index_adjustment[1]
+    next_row_index = start.row_index + index_adjustment[0]
+    next_column_index = start.column_index + index_adjustment[1]
 
     next_position = chess_board[next_row_index][next_column_index]
 
