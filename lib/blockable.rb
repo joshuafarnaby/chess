@@ -23,7 +23,7 @@ module Blockable
       adjacents_array.push(chess_board[row_index][column_index])
     end
 
-    p adjacents_array
+    # p adjacents_array
 
     adjacents_array
   end

@@ -6,7 +6,7 @@ class King
   def initialize(color)
     @name = 'king'
     @color = color
-    @symbol = @team == 'white' ? "\u2654" : "\u265A"
+    @symbol = @color == 'white' ? "\u2654" : "\u265A"
     @in_play = true
   end
 end
