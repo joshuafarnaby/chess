@@ -7,7 +7,7 @@ chess_game.display_in_terminal
 
 white_turn = true
 
-3.times do
+5.times do
   current_color = white_turn ? 'white' : 'black'
 
   chess_game.take_turn(current_color)
