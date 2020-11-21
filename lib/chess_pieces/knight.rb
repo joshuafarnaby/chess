@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
-require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/convertable.rb'
+require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/blockable.rb'
+require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/pathable.rb'
 
 class Knight
-  include Convertable
+  include Blockable
+  include Pathable
 
   attr_reader :name, :color, :symbol
   attr_accessor :in_play, :moves_made
@@ -27,35 +29,22 @@ class Knight
     @moves_made = 0
   end
 
-  def blocked_in?(_start, _chess_board)
-    false
+  def blocked_in?(start, chess_board)
+    blocked?(MOVE_LIST, start, chess_board)
   end
 
   def legal_move?(start, target, chess_board)
-    color = start.occupying_piece.color
-    reachable_positions = generate_reachable_positions(start, chess_board)
-
-    reachable_positions.one? do |position|
-      !position.is_occupied || (position.is_occupied && position.occupying_piece.color != color) if position == target
-    end
+    target_position_valid?(start, target, chess_board)
   end
 
   private
 
-  def generate_reachable_positions(start, chess_board, reachable_positions = [])
-    MOVE_LIST.each do |sub_arr|
-      new_row_idx = start.row_index + sub_arr[0]
-      new_column_idx = start.column_index + sub_arr[1]
+  def target_position_valid?(start, target, chess_board)
+    color = start.occupying_piece.color
+    reachable_positions = get_direct_adjacents(MOVE_LIST, start, chess_board)
 
-      next if invalid_positions?(new_row_idx, new_column_idx)
-
-      reachable_positions.push(chess_board[new_row_idx][new_column_idx])
+    reachable_positions.one? do |position|
+      position == target && (!target.is_occupied || target.is_occupied && target.occupying_piece.color != color)
     end
-
-    reachable_positions
-  end
-
-  def invalid_positions?(new_row_idx, new_column_idx)
-    (new_row_idx > 7 || new_column_idx > 7) || (new_row_idx < 0 || new_column_idx < 0)
   end
 end
