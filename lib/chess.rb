@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'board'
-require_relative 'convertable'
+require_relative './modules/convertable'
 require_relative './chess_pieces/king'
 require_relative './chess_pieces/queen'
 require_relative './chess_pieces/rook'

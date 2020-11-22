@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/blockable.rb'
-require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/pathable.rb'
+require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/blockable.rb'
+require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/pathable.rb'
 
 class Queen
   include Blockable
