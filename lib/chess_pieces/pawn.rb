@@ -1,14 +1,16 @@
 # frozen_string_literal: true
 
-require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/convertable.rb'
-require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/gettable.rb'
+require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/blockable.rb'
+require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/pathable.rb'
 
 class Pawn
-  include Convertable
-  include Gettable
+  include Blockable
+  include Pathable
 
-  attr_reader :name, :color, :symbol
+  attr_reader :name, :color, :symbol, :relative_move_idxs
   attr_accessor :moves_made, :in_play
+
+  # RELATIVE_MOVE_IDXS = @color == 'white' ? [[-1, 0], [-2, 0], [-1, -1], [-1, 1]] : [[1, 0], [2, 0], [1, 1], [1, -1]]
 
   def initialize(color)
     @name = 'pawn'
@@ -16,76 +18,83 @@ class Pawn
     @symbol = @color == 'white' ? "\u2659" : "\u265F"
     @moves_made = 0
     @in_play = true
+    @relative_move_idxs = @color == 'white' ? [[-1, 0], [-1, -1], [-1, 1]] : [[1, 0], [1, 1], [1, -1]]
   end
 
-  def legal_move?(start_square, target_square, chess_board)
-    potential_moves_array = determine_potential_next_positions(start_square, chess_board)
+  def blocked_in?(start, chess_board)
+    forward_square = assign_forward(start, chess_board)
 
-    return false unless valid_target_square?(potential_moves_array, target_square)
-
-    move_is_possible?(start_square, target_square, potential_moves_array)
+    forward_square.is_occupied ? !can_move_diagonally?(start, chess_board) : false
   end
 
-  def move_is_possible?(start_square, target_square, potential_moves_array)
-    forward = potential_moves_array[0]
-    forward_left = potential_moves_array[1]
-    forward_right = potential_moves_array[2]
-    forward_double = potential_moves_array[3] if potential_moves_array.length == 4
+  def legal_move?(start, target, chess_board)
+    return false unless valid_target?(start, target, chess_board)
 
-    if target_square == forward
-      return false if forward.is_occupied
-    elsif target_square == forward_double
-      return false unless !forward_double.is_occupied && !forward.is_occupied
+    if @moves_made == 0 && opening_double_move?(start, target)
+      evaluate_path(start, target, chess_board)
     else
-      return possible_diagonal_move?(start_square, target_square, forward_left, forward_right)
-    end
-
-    true
-  end
-
-  def possible_diagonal_move?(start_square, target_square, forward_left, forward_right)
-    if target_square == forward_left
-      forward_left.is_occupied && forward_left.occupying_piece.color != start_square.occupying_piece.color
-    else
-      forward_right.is_occupied && forward_right.occupying_piece.color != start_square.occupying_piece.color
+      evaluate_target(start, target)
     end
   end
 
-  def determine_potential_next_positions(start_square, chess_board)
-    forward = get_forward(start_square, chess_board)
-    forward_left = get_forward_left(start_square, chess_board)
-    forward_right = get_forward_right(start_square, chess_board)
+  def can_move_diagonally?(start, chess_board)
+    color = start.occupying_piece.color
 
-    return [forward, forward_left, forward_right] if @moves_made > 0
-
-    forward_double = get_forward_double(start_square, chess_board)
-    [forward, forward_left, forward_right, forward_double]
-  end
-
-  def blocked_in?(board_square, chess_board)
-    forward_square = get_forward(board_square, chess_board)
-
-    if forward_square.is_occupied
-      forward_left = get_forward_left(board_square, chess_board)
-      forward_right = get_forward_right(board_square, chess_board)
-
-      !can_move_diagonally?(board_square, forward_left, forward_right)
-    else
-      false
-    end
-  end
-
-  def can_move_diagonally?(board_square, forward_left, forward_right)
-    current_color = board_square.occupying_piece.color
+    forward_left = assign_forward_left(start, chess_board)
+    forward_right = assign_forward_right(start, chess_board)
 
     [forward_left, forward_right].one? do |potential_square|
       next if potential_square.nil?
 
-      potential_square.is_occupied && potential_square.occupying_piece.color != current_color
+      potential_square.is_occupied && potential_square.occupying_piece.color != color
     end
   end
 
-  def valid_target_square?(position_array, target_square)
-    position_array.one? { |square| square == target_square }
+  def evaluate_target(start, target)
+    color = start.occupying_piece.color
+
+    if start.column_index == target.column_index
+      !target.is_occupied
+    else
+      target.is_occupied && target.occupying_piece.color != color
+    end
+  end
+
+  def evaluate_path(start, target, chess_board)
+    index_adjustment = @color == 'white' ? [-1, 0] : [1, 0]
+
+    path = build_path(start, target, chess_board, index_adjustment)
+
+    path.all? { |position| !position.is_occupied }
+  end
+
+  def opening_double_move?(start, target)
+    (start.row_index - target.row_index).abs == 2 && start.column_index == target.column_index
+  end
+
+  def assign_forward(start, chess_board)
+    @color == 'white' ? chess_board[start.row_index - 1][start.column_index] : chess_board[start.row_index + 1][start.column_index]
+  end
+
+  def assign_forward_left(start, chess_board)
+    f_left_row_index = @color == 'white' ? start.row_index - 1 : start.row_index + 1
+    f_left_col_index = @color == 'white' ? start.column_index - 1 : start.column_index + 1
+
+    chess_board[f_left_row_index][f_left_col_index] unless invalid_indices?(f_left_row_index, f_left_col_index)
+  end
+
+  def assign_forward_right(start, chess_board)
+    f_right_row_index = @color == 'white' ? start.row_index - 1 : start.row_index + 1
+    f_right_col_index = @color == 'white' ? start.column_index + 1 : start.column_index - 1
+
+    chess_board[f_right_row_index][f_right_col_index] unless invalid_indices?(f_right_row_index, f_right_col_index)
+  end
+
+  def valid_target?(start, target, chess_board)
+    return true if @moves_made == 0 && opening_double_move?(start, target)
+
+    potential_next_positions = get_direct_adjacents(@relative_move_idxs, start, chess_board)
+
+    potential_next_positions.one? { |position| position == target }
   end
 end

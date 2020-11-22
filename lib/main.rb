@@ -7,6 +7,8 @@ chess_game.display_in_terminal
 
 white_turn = true
 
+# p chess_game.chess_board[6][0].occupying_piece.relative_move_idxs
+
 5.times do
   current_color = white_turn ? 'white' : 'black'
 
