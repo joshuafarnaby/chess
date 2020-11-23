@@ -4,6 +4,11 @@ require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/blockable.rb'
 require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/pathable.rb'
 require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/moveable.rb'
 
+require_relative './queen'
+require_relative './rook'
+require_relative './knight'
+require_relative './bishop'
+
 class Pawn
   include Blockable
   include Pathable
@@ -23,12 +28,14 @@ class Pawn
     @relative_move_idxs = @color == 'white' ? [[-1, 0], [-1, -1], [-1, 1]] : [[1, 0], [1, 1], [1, -1]]
   end
 
-  def execute_move(start, target, chess_board)
+  def execute_move(start, target, chess_obj)
     if !target.is_occupied
       execute_standard_move(start, target)
     elsif target.is_occupied
-      execute_capture_move(start, target, chess_board)
+      execute_capture_move(start, target, chess_obj)
     end
+
+    execute_promotion(target, chess_obj) if promotion_viable?(target)
   end
 
   def blocked_in?(start, chess_board)
@@ -78,6 +85,43 @@ class Pawn
     path = build_path(start, target, chess_board, index_adjustment)
 
     path.all? { |position| !position.is_occupied }
+  end
+
+  def execute_promotion(target, chess_obj)
+    chess_obj.display_in_terminal
+
+    puts "The pawn at #{target.position} can be promoted"
+    puts 'Enter QUEEN, ROOK, KNIGHT or BISHOP:'
+
+    user_choice_str = gets_user_choice
+
+    new_piece_class = fetch_class(user_choice_str)
+
+    new_piece = new_piece_class.new(target.occupying_piece.color)
+
+    target.occupying_piece = new_piece
+  end
+
+  def promotion_viable?(target)
+    pawn = target.occupying_piece
+
+    target.row_index == (pawn.color == 'white' ? 0 : 7)
+  end
+
+  def gets_user_choice
+    loop do
+      input = gets.chomp.strip.upcase
+      return input if input == 'QUEEN' || input == 'ROOK' || input == 'KNIGHT' || input == 'BISHOP'
+
+      puts 'That input is not recognised, try again:'
+    end
+  end
+
+  def fetch_class(class_name_str)
+    return Queen if class_name_str == 'QUEEN'
+    return Rook if class_name_str == 'ROOK'
+    return Knight if class_name_str == 'KNIGHT'
+    return Bishop if class_name_str == 'BISHOP'
   end
 
   def opening_double_move?(start, target)
