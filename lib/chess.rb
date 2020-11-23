@@ -83,7 +83,6 @@ class Chess < GameBoard
       moving_piece = start.occupying_piece
       moving_piece.legal_move?(start, target, self)
     else
-      # puts issue(start, color)
       false
     end
   end
@@ -91,17 +90,6 @@ class Chess < GameBoard
   def valid_start?(start, color)
     start.is_occupied && start.occupying_piece.color == color
   end
-
-  # def issue(start, color)
-  #   position = start.position
-  #   piece = start.occupying_piece.name if start.is_occupied
-
-  #   puts "#{position} is empty, make a different move:" unless start.is_occupied
-
-  #   if start.is_occupied && start.occupying_piece.color != color
-  #     puts "The #{piece} at #{position} belongs to the opposition, make a different move:"
-  #   end
-  # end
 
   def begin_turn_prompt(color)
     puts "#{color.capitalize}, make your move:"
