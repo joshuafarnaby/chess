@@ -10,7 +10,7 @@ module Moveable
     moving_piece.moves_made += 1
   end
 
-  def execute_capture_move(start, target, chess_board)
+  def execute_capture_move(start, target, chess_obj)
     moving_piece = start.reset
     captured_piece = target.reset
 
@@ -18,9 +18,9 @@ module Moveable
     target.is_occupied = true
 
     if captured_piece.color == 'white'
-      chess_board.white_graveyard.push(captured_piece)
+      chess_obj.white_graveyard.push(captured_piece)
     else
-      chess_board.black_graveyard.push(captured_piece)
+      chess_obj.black_graveyard.push(captured_piece)
     end
 
     moving_piece.moves_made += 1

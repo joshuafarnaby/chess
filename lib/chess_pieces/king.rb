@@ -2,10 +2,12 @@
 
 require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/blockable.rb'
 require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/pathable.rb'
+require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/moveable.rb'
 
 class King
   include Blockable
   include Pathable
+  include Moveable
 
   attr_accessor :in_play, :moves_made
   attr_reader :name, :color, :symbol
@@ -27,6 +29,14 @@ class King
     @symbol = @color == 'white' ? "\u2654" : "\u265A"
     @in_play = true
     @moves_made = 0
+  end
+
+  def execute_move(start, target, chess_obj)
+    if !target.is_occupied
+      execute_standard_move(start, target)
+    elsif target.is_occupied
+      execute_capture_move(start, target, chess_obj)
+    end
   end
 
   def blocked_in?(start, chess_board)

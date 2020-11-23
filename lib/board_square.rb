@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/convertable.rb'
+require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/convertable.rb'
 
 class BoardSquare
   include Convertable

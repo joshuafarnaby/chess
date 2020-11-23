@@ -2,10 +2,12 @@
 
 require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/blockable.rb'
 require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/pathable.rb'
+require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/moveable.rb'
 
 class Pawn
   include Blockable
   include Pathable
+  include Moveable
 
   attr_reader :name, :color, :symbol, :relative_move_idxs
   attr_accessor :moves_made, :in_play
@@ -19,6 +21,14 @@ class Pawn
     @moves_made = 0
     @in_play = true
     @relative_move_idxs = @color == 'white' ? [[-1, 0], [-1, -1], [-1, 1]] : [[1, 0], [1, 1], [1, -1]]
+  end
+
+  def execute_move(start, target, chess_board)
+    if !target.is_occupied
+      execute_standard_move(start, target)
+    elsif target.is_occupied
+      execute_capture_move(start, target, chess_board)
+    end
   end
 
   def blocked_in?(start, chess_board)
@@ -36,6 +46,8 @@ class Pawn
       evaluate_target(start, target)
     end
   end
+
+  private
 
   def can_move_diagonally?(start, chess_board)
     color = start.occupying_piece.color

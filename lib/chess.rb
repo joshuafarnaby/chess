@@ -12,7 +12,7 @@ require_relative './chess_pieces/pawn'
 class Chess < GameBoard
   include Convertable
 
-  attr_accessor :chess_board, :rounds_played
+  attr_accessor :chess_board, :rounds_played, :white_graveyard, :black_graveyard
 
   def initialize
     @white_pieces = [
@@ -49,11 +49,16 @@ class Chess < GameBoard
   end
 
   def take_turn(current_color)
-    puts begin_turn_prompt(current_color)
+    begin_turn_prompt(current_color)
 
     positions = gets_positions(current_color)
 
-    execute_move(positions[0], positions[1])
+    start = positions[0]
+    target = positions[1]
+
+    moving_piece = start.occupying_piece
+
+    moving_piece.execute_move(start, target, self)
   end
 
   private
@@ -70,14 +75,14 @@ class Chess < GameBoard
   end
 
   def begin_turn_prompt(color)
-    "#{color.capitalize}, enter the position of the piece you want to move and the position you want to move to, seperated by a slash (e.g. A2/A4):"
+    puts "#{color.capitalize}, make your move:"
+    puts '(Example: To move from A2 to A4 enter A2/A4)'
   end
 
   def gets_player_input
     loop do
       input = gets.chomp.upcase
 
-      break if input == 'break'
       return input unless input.match(%r{^[A-H]{1}[1-8]{1}/[A-H]{1}[1-8]{1}$}i).nil?
 
       puts 'That input is not recognised, try again:'
@@ -91,21 +96,21 @@ class Chess < GameBoard
     @chess_board[row_index][column_index]
   end
 
-  def execute_move(starting_square, target_square)
-    moving_piece = starting_square.reset
+  # def execute_move(starting_square, target_square)
+  #   moving_piece = starting_square.reset
 
-    if target_square.is_occupied
-      captured_piece = target_square.occupying_piece
-      captured_piece.in_play = false
-      moving_piece.color == 'white' ? @black_graveyard.push(captured_piece) : @white_graveyard.push(captured_piece)
-      target_square.occupying_piece = moving_piece
-    else
-      target_square.occupying_piece = moving_piece
-      target_square.is_occupied = true
-    end
+  #   if target_square.is_occupied
+  #     captured_piece = target_square.occupying_piece
+  #     captured_piece.in_play = false
+  #     moving_piece.color == 'white' ? @black_graveyard.push(captured_piece) : @white_graveyard.push(captured_piece)
+  #     target_square.occupying_piece = moving_piece
+  #   else
+  #     target_square.occupying_piece = moving_piece
+  #     target_square.is_occupied = true
+  #   end
 
-    moving_piece.moves_made += 1
-  end
+  #   moving_piece.moves_made += 1
+  # end
 
   def valid_start_position?(board_square, color)
     position = board_square.position

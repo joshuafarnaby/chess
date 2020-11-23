@@ -2,10 +2,12 @@
 
 require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/blockable.rb'
 require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/pathable.rb'
+require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/moveable.rb'
 
 class Queen
   include Blockable
   include Pathable
+  include Moveable
 
   attr_reader :name, :color, :symbol
   attr_accessor :in_play, :moves_made
@@ -31,6 +33,14 @@ class Queen
 
   def blocked_in?(start, chess_board)
     blocked?(DIRECT_ADJACENT, start, chess_board)
+  end
+
+  def execute_move(start, target, chess_obj)
+    if !target.is_occupied
+      execute_standard_move(start, target)
+    elsif target.is_occupied
+      execute_capture_move(start, target, chess_obj)
+    end
   end
 
   def legal_move?(start, target, chess_board)
