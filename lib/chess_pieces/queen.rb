@@ -43,7 +43,9 @@ class Queen
     end
   end
 
-  def legal_move?(start, target, chess_board)
+  def legal_move?(start, target, chess_obj)
+    chess_board = chess_obj.chess_board
+
     target_position_valid?(start, target) && path_is_clear?(start, target, chess_board)
   end
 

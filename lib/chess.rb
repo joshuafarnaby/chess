@@ -12,7 +12,7 @@ require_relative './chess_pieces/pawn'
 class Chess < GameBoard
   include Convertable
 
-  attr_accessor :chess_board, :rounds_played, :white_graveyard, :black_graveyard
+  attr_accessor :chess_board, :round_number, :white_graveyard, :black_graveyard
 
   def initialize
     @white_pieces = [
@@ -29,7 +29,7 @@ class Chess < GameBoard
     @ranks = [8, 7, 6, 5, 4, 3, 2, 1]
     @chess_board = initialize_chess_board
 
-    @rounds_played = 0
+    @round_number = 0
     @white_graveyard = []
     @black_graveyard = []
   end
@@ -49,6 +49,8 @@ class Chess < GameBoard
   end
 
   def take_turn(current_color)
+    @round_number += 1
+
     begin_turn_prompt(current_color)
 
     positions = gets_positions(current_color)
@@ -70,13 +72,40 @@ class Chess < GameBoard
       start = get_corresponding_square(positions[0])
       target = get_corresponding_square(positions[1])
 
-      return [start, target] if valid_start_position?(start, color) && valid_target_position?(start, target)
+      return [start, target] if valid_move?(start, target, color)
+
+      puts 'That move is not legal, make another move:'
     end
   end
 
+  def valid_move?(start, target, color)
+    if valid_start?(start, color)
+      moving_piece = start.occupying_piece
+      moving_piece.legal_move?(start, target, self)
+    else
+      # puts issue(start, color)
+      false
+    end
+  end
+
+  def valid_start?(start, color)
+    start.is_occupied && start.occupying_piece.color == color
+  end
+
+  # def issue(start, color)
+  #   position = start.position
+  #   piece = start.occupying_piece.name if start.is_occupied
+
+  #   puts "#{position} is empty, make a different move:" unless start.is_occupied
+
+  #   if start.is_occupied && start.occupying_piece.color != color
+  #     puts "The #{piece} at #{position} belongs to the opposition, make a different move:"
+  #   end
+  # end
+
   def begin_turn_prompt(color)
     puts "#{color.capitalize}, make your move:"
-    puts '(Example: To move from A2 to A4 enter A2/A4)'
+    puts 'E.G: To move from A2 to A4 enter A2/A4'
   end
 
   def gets_player_input
@@ -94,93 +123,6 @@ class Chess < GameBoard
     column_index = gets_column_index(filerank_str)
 
     @chess_board[row_index][column_index]
-  end
-
-  # def execute_move(starting_square, target_square)
-  #   moving_piece = starting_square.reset
-
-  #   if target_square.is_occupied
-  #     captured_piece = target_square.occupying_piece
-  #     captured_piece.in_play = false
-  #     moving_piece.color == 'white' ? @black_graveyard.push(captured_piece) : @white_graveyard.push(captured_piece)
-  #     target_square.occupying_piece = moving_piece
-  #   else
-  #     target_square.occupying_piece = moving_piece
-  #     target_square.is_occupied = true
-  #   end
-
-  #   moving_piece.moves_made += 1
-  # end
-
-  def valid_start_position?(board_square, color)
-    position = board_square.position
-
-    return false unless start_position_occupied?(board_square, position)
-    return false unless correct_piece_color?(board_square, color, position)
-
-    if board_square.occupying_piece.blocked_in?(board_square, @chess_board)
-      puts "The #{board_square.occupying_piece.name} at #{position} is currently blocked, make another move:"
-      return false
-    end
-
-    true
-  end
-
-  def valid_target_position?(start_square, target_square)
-    current_color = start_square.occupying_piece.color
-
-    return false if same_position?(start_square, target_square)
-    return false if target_square.is_occupied && same_color_at_target?(current_color, target_square)
-
-    unless start_square.occupying_piece.legal_move?(start_square, target_square, @chess_board)
-      puts "A #{start_square.occupying_piece.name} cannot legally move to that position, choose another:"
-      return false
-    end
-
-    true
-  end
-
-  def start_position_occupied?(board_square, position)
-    return true if board_square.is_occupied
-
-    puts "#{position} is currently empty, you must choose an occupied start position:"
-
-    false
-  end
-
-  def correct_piece_color?(board_square, color, position)
-    start_piece_color = board_square.occupying_piece.color
-    piece = board_square.occupying_piece.name
-
-    return true if start_piece_color == color
-
-    puts "The #{piece} at #{position} belongs to the opposition, select a position occupied by your color:"
-
-    false
-  end
-
-  def same_color_at_target?(color, target_square)
-    target_position = target_square.position
-    piece_at_target = target_square.occupying_piece
-
-    if color == piece_at_target.color
-      puts "You cannot move to #{target_position} because the #{piece_at_target.name} there is your own color, choose another:"
-      true
-    else
-      false
-    end
-  end
-
-  def same_position?(start_square, target_square)
-    start_position = start_square.position
-    target_position = target_square.position
-
-    if start_position == target_position
-      puts "You must move away from #{start_position}, choose another position that is not #{target_position}:"
-      true
-    else
-      false
-    end
   end
 
   def initialize_chess_board

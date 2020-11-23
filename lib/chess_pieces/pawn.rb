@@ -15,7 +15,7 @@ class Pawn
   include Moveable
 
   attr_reader :name, :color, :symbol, :relative_move_idxs
-  attr_accessor :moves_made, :in_play
+  attr_accessor :moves_made, :in_play, :en_passant
 
   # RELATIVE_MOVE_IDXS = @color == 'white' ? [[-1, 0], [-2, 0], [-1, -1], [-1, 1]] : [[1, 0], [2, 0], [1, 1], [1, -1]]
 
@@ -26,10 +26,15 @@ class Pawn
     @moves_made = 0
     @in_play = true
     @relative_move_idxs = @color == 'white' ? [[-1, 0], [-1, -1], [-1, 1]] : [[1, 0], [1, 1], [1, -1]]
+    @en_passant = nil
   end
 
   def execute_move(start, target, chess_obj)
-    if !target.is_occupied
+    if opening_double_move?(start, target)
+      execute_opening_double_move(start, target, chess_obj)
+    elsif en_passant?(start, target, chess_obj)
+      execute_en_passant(start, target, chess_obj)
+    elsif !target.is_occupied
       execute_standard_move(start, target)
     elsif target.is_occupied
       execute_capture_move(start, target, chess_obj)
@@ -38,14 +43,21 @@ class Pawn
     execute_promotion(target, chess_obj) if promotion_viable?(target)
   end
 
-  def blocked_in?(start, chess_board)
+  def blocked_in?(start, chess_obj)
+    chess_board = chess_obj.chess_board
+
     forward_square = assign_forward(start, chess_board)
 
     forward_square.is_occupied ? !can_move_diagonally?(start, chess_board) : false
   end
 
-  def legal_move?(start, target, chess_board)
+  def legal_move?(start, target, chess_obj)
+    return false if start == target || friendly_fire?(start, target)
+
+    chess_board = chess_obj.chess_board
+
     return false unless valid_target?(start, target, chess_board)
+    return true if en_passant?(start, target, chess_obj)
 
     if @moves_made == 0 && opening_double_move?(start, target)
       evaluate_path(start, target, chess_board)
@@ -55,6 +67,43 @@ class Pawn
   end
 
   private
+
+  def en_passant?(start, target, chess_obj)
+    chess_board = chess_obj.chess_board
+    current_round = chess_obj.round_number
+    color = start.occupying_piece.color
+
+    piece_to_capture = chess_board[start.row_index][target.column_index].occupying_piece
+
+    return false if piece_to_capture.name != 'pawn' || piece_to_capture.color == color
+
+    piece_to_capture.en_passant == current_round - 1
+  end
+
+  def execute_opening_double_move(start, target, chess_obj)
+    moving_piece = start.reset
+
+    target.occupying_piece = moving_piece
+    target.is_occupied = true
+
+    moving_piece.en_passant = chess_obj.round_number
+    moving_piece.moves_made += 1
+  end
+
+  def execute_en_passant(start, target, chess_obj)
+    moving_piece = start.reset
+    passing_square = chess_obj.chess_board[start.row_index][target.column_index]
+    captured_piece = passing_square.reset
+
+    target.occupying_piece = moving_piece
+    target.is_occupied = true
+
+    if captured_piece.color == 'white'
+      chess_obj.white_graveyard.push(captured_piece)
+    else
+      chess_obj.black_graveyard.push(captured_piece)
+    end
+  end
 
   def can_move_diagonally?(start, chess_board)
     color = start.occupying_piece.color
@@ -96,7 +145,6 @@ class Pawn
     user_choice_str = gets_user_choice
 
     new_piece_class = fetch_class(user_choice_str)
-
     new_piece = new_piece_class.new(target.occupying_piece.color)
 
     target.occupying_piece = new_piece

@@ -43,7 +43,9 @@ class Knight
     blocked?(MOVE_LIST, start, chess_board)
   end
 
-  def legal_move?(start, target, chess_board)
+  def legal_move?(start, target, chess_obj)
+    chess_board = chess_obj.chess_board
+
     target_position_valid?(start, target, chess_board)
   end
 

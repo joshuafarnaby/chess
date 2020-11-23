@@ -25,4 +25,13 @@ module Moveable
 
     moving_piece.moves_made += 1
   end
+
+  def friendly_fire?(start, target)
+    return false unless target.is_occupied
+
+    start_color = start.occupying_piece.color
+    target_color = target.occupying_piece.color
+
+    start_color == target_color
+  end
 end
