@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/blockable.rb'
 require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/pathable.rb'
 require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/moveable.rb'
 
 class Queen
-  include Blockable
   include Pathable
   include Moveable
 
@@ -29,10 +27,6 @@ class Queen
     @symbol = @color == 'white' ? "\u2655" : "\u265B"
     @in_play = true
     @moves_made = 0
-  end
-
-  def blocked_in?(start, chess_board)
-    blocked?(DIRECT_ADJACENT, start, chess_board)
   end
 
   def execute_move(start, target, chess_obj)

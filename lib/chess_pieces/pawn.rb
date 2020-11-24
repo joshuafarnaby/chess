@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/blockable.rb'
 require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/pathable.rb'
 require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/moveable.rb'
 
@@ -10,7 +9,6 @@ require_relative './knight'
 require_relative './bishop'
 
 class Pawn
-  include Blockable
   include Pathable
   include Moveable
 
@@ -55,6 +53,8 @@ class Pawn
     end
   end
 
+  private
+
   def valid_target?(start, target, chess_obj)
     return false if start == target || friendly_fire?(start, target)
     return true if @moves_made == 0 && opening_double_move?(start, target)
@@ -64,8 +64,6 @@ class Pawn
 
     potential_next_positions.one? { |position| position == target }
   end
-
-  private
 
   def en_passant?(start, target, chess_obj)
     chess_board = chess_obj.chess_board

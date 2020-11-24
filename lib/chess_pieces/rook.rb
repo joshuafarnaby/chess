@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/blockable.rb'
 require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/pathable.rb'
 require '/Users/joshuafarnaby/Ruby/final_project/chess/lib/modules/moveable.rb'
 
 class Rook
-  include Blockable
   include Pathable
   include Moveable
 
@@ -33,10 +31,6 @@ class Rook
     elsif target.is_occupied
       execute_capture_move(start, target, chess_obj)
     end
-  end
-
-  def blocked_in?(start, chess_board)
-    blocked?(DIRECT_ADJACENT, start, chess_board)
   end
 
   def legal_move?(start, target, chess_obj)
